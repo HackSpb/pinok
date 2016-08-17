@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{% include 'parts/overall/head.twig' %}
+	</head>
+	<header>
+		{% include 'parts/overall/header.twig' %}
+	</header> 
+	<body>
+		<div class="container home-box-body">
+			<div class="row">
+				{% include 'parts/home/home_code.twig' %}
+			</div>
+			<div class="row">
+				<div class="hidden-xs hidden-sm col-md-9">
+				{% include 'parts/home/home_slider.twig' %}
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-3">
+				{% include 'parts/home/home_forma.twig' %}
+				{% include 'parts/home/home_info_min.twig' %}
+				</div>
+			</div>
+			<div class="row" align="center">
+				{% include 'parts/home/home_info_block_1.twig' %}
+			</div>
+            <div class="row" align="center">
+				{% include 'parts/home/home_info_block_2.twig' %}
+			</div>
+		</div>
+		{% include 'parts/home/home_footer.twig' %}
+		{% include 'parts/home/home_java_slider.twig' %}
+	</body>
+</html>

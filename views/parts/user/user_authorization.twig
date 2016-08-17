@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{% include 'parts/overall/head.twig' %}
+	</head>
+	<header>
+		{% include 'parts/overall/header.twig' %}
+	</header> 
+	<body>
+		<div class="container home-box-body">
+			<div class="row main_block_special">
+				<div class="col-xs-12 col-sm-12 col-md-8 block_of_task">
+					<div class="user-auth-main-block">
+						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button>
+						<div class="col-xs-12 col-sm-12 col-md-12">
+							<div id="tasks"></div>
+							<div id="page" align="center"></div>
+						</div>
+					</div>					
+				</div>
+				<div class="col-xs-12 col-sm-12 col-md-4">
+					<div class="user-auth-add-task-to-friend-block">
+						<h3 align="center">Создать задачу для другого человека</h3>
+						<form class="form-horizontal" method="post" action="">
+							<div class="form-group">
+								<label for="email_friend" class="col-sm-2 control-label">Email</label>
+								<div class="col-sm-10">
+									<input type="email" name="email_friend" class="form-control" id="email_friend" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="task" class="col-sm-2 control-label">Задача</label>
+								<div class="col-sm-10">
+									<input type="text" name="task" class="form-control" id="task" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="code" class="col-sm-2 control-label">Код</label>
+								<div class="col-sm-10">
+									<input type="text" name="code" class="form-control" id="code" required>
+								</div>
+							</div>
+							<div align="center">
+								<input onclick="code_for_send_task();" type="button" name="get_code" class="btn btn-success" value="Получить код">
+								<input type="button" onclick="send_task();" class="btn btn-success" value="Отправить задачу">
+								<a onclick="$('#special_param').slideToggle('slow');" href="javascript://">Дополнительные параметры</a>
+								<div id="special_param" style="display:none">
+							<div class="form-group">
+								<label for="description" class="col-sm-3 control-label">Пометка</label>
+								<div class="col-sm-9">
+									<textarea type="text" name="description" rows="5" class="form-control" id="description"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="deadline" class="col-sm-3 control-label">Конечный срок</label>
+								<div class="col-sm-9">
+									<input type="date" name="deadline" class="form-control" id="deadline" required>
+								</div>
+							</div>
+								</div>
+							</div>
+							
+						</form>
+						<div id="answer_code_send"></div>
+						<div id="answer"></div>
+					</div>					
+				</div>
+			</div>
+			{% include 'parts/overall/footer.twig' %}
+		</div>
+		<script>		
+			function code_for_send_task(){
+				var email_friend = $('#email_friend').val();
+				var task = $('#task').val();
+				if (email_friend==="" || task===""){
+					alert("Заполните поля email и название задачи!");
+				} else {
+				var query = "email_friend="+email_friend+"&task="+task;				
+				$.ajax({
+					type: "POST",
+					url: "code_for_send_task",
+					data: query,
+					success: function(answer) {
+						$("#answer_code_send").html(answer);
+					}
+				});
+				}
+			}
+				
+			function send_task(){
+				var email_friend = $('#email_friend').val();
+				var task = $('#task').val();
+				var code = $('#code').val();
+				var description = $('#description').val();
+				var deadline = $('#deadline').val();
+				var query = "email_friend="+email_friend+"&task="+task+"&code="+code+"&description="+description+"&deadline="+deadline;				
+				$.ajax({
+					type: "POST",
+					url: "get/new_task",
+					data: query,
+					success: function(answer) {
+						$("#answer").html(answer);
+					}
+				});		
+			}
+				
+			$(document).ready(function(){
+			var y = location.search;
+			$.getJSON("/upload/tasks/all"+y,
+			function(data){
+				console.log(data);
+				var countall = data['count_all'];
+				var lim = data['lim'];
+				var page = countall/lim;
+				var newpage = Math.ceil(page);
+				var z;
+				for (z=1; z<=newpage; z++) {
+					$('#page').append("<a onclick=\"sendData('"+y+"&page="+z+"');\" href=\"javascript://\"><button>"+z+"</button></a>");  
+				}
+				var i;  
+				for (i=0;i<=lim;i++) {
+					if ( [('number_' + i)] in data ) {
+					$('#tasks').append("<div id='lvlup_1_id"+i+"'><p>"+data[('number_' + i)]['t_name']+"</p><p>"+data[('number_' + i)]['t_description']+"</p><p>"+data[('number_' + i)]['t_date_create']+"</p><p>"+data[('number_' + i)]['t_date_finish']+"</p><hr><div id='task_lvl_2_" + i + "'></div></div>"); 
+				}}}
+		)});
+			
+		function sendData (sData) {
+			location.search = sData;
+		} 
+		</script>
+	</body>
+</html>
