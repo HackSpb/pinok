@@ -185,6 +185,7 @@ function registration ($request, $app){
 	}
 	
 	function code_for_send_task ($app, $request) {
+		global $config;
 		$task = $request->get('task');
 		$email_friend = $request->get('email_friend');
 		$code = md5($email_friend.time());
@@ -193,11 +194,14 @@ function registration ($request, $app){
 		global $mailer;
 		$message = \Swift_Message::newInstance()
 		->setSubject('Код для создания задачи для'.$email_friend)
-		->setFrom(array('bramin90@gmail.com'))
+		->setFrom(array($config['mail']['user']))
 		->setTo(array($_SESSION['user']['u_email']))
 		->setBody($app['twig']->render('parts/emails/email_code_for_send_task.twig', array('email_friend' => $email_friend, 'task' => $task, 'code' => $code)),'text/html');
 		$mailer->send($message);
-		return "success, код выслан вам на почту";
+		return "<div class=\"alert alert-dismissible alert-success\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Внимание! </strong> Код выслан Вам на почту!
+					</div>";;
 	}
 	
 	function send_task ($app, $request) {
@@ -233,7 +237,10 @@ function registration ($request, $app){
 					$stm = $dbh->prepare($sql);
 					$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
 					unset($_SESSION['code_for_send_task']);
-					return "Задача создана!".$result_task['t_id'].$result_us['u_id'];
+					return "<div class=\"alert alert-dismissible alert-success\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Поздравляем! </strong> Задача создана!<br>Название задачи:".$task."<br>Для пользователя:".$email_friend."!
+					</div>";
 				}else {
 					$sql = "INSERT INTO tasks (t_name, t_date_create, t_description, t_date_finish) VALUES (:t_name, :t_date_create, :t_description, :t_date_finish)";
 					$stm = $dbh->prepare($sql);
@@ -264,17 +271,29 @@ function registration ($request, $app){
 						->setBody($app['twig']->render('parts/emails/email_new_task_for_new_user.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $task, 'site' => $_SERVER['HTTP_HOST'])),'text/html');
 					$mailer->send($message);
 					unset($_SESSION['code_for_send_task']);
-					return "Задача создана!";				
+					return "<div class=\"alert alert-dismissible alert-success\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Поздравляем! </strong> Задача создана!<br>Название задачи:".$task."<br>Для пользователя:".$email_friend."!
+					</div>";				
 				}			
 			}else {
-				return "Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через сутки.".$count_result_today[0]['t_name'].$count_result_today[1]['t_name'].$count_result_today[2]['t_name'].$count_result_today[3]['t_name'];
+				$time_waiting = new DateTime($result[4]['t_date_create']);
+				$time_waiting->add(new DateInterval('P1D'));
+				$time_waiting->sub(new DateInterval($t_date_create));
+				return "<div class=\"alert alert-dismissible alert-warning\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Внимание! </strong> Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через ".$time_waiting->format('Y-m-d H:i:s')."<br>Последние задачи, которые Вы составили:<br>".$result[0]['t_name']."<br>".$result[1]['t_name']."<br>".$result[2]['t_name']."<br>".$result[3]['t_name']."<br>".$result[4]['t_name']."
+					</div>";		
 			}
 		} else {
-			return "Код не совпадает!";
+			return "<div class=\"alert alert-dismissible alert-warning\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Внимание! </strong> Код не совпадает!
+					</div>";
 		}
 	}
 
-	function export_tasks ($request) {
+	function import_tasks ($request) {
 		$lim = 5;	//count of product on one page
 		$page = $request->get('page');
 		$task_type = $request->get('task');
@@ -322,6 +341,7 @@ function registration ($request, $app){
 				}
 		$result_new['count_all'] = $count_result;
 		$result_new['lim'] = $lim;
+		$result_new['task_type'] = $task_type;
 		return json_encode ($result_new);		
 	}
 	
@@ -330,4 +350,47 @@ function registration ($request, $app){
 		setcookie ("auth_key", "", time() - 3600, "/", $_SERVER['HTTP_HOST'], false, true);
 	}
 
+
+	function export_tasks($request){
+
+		global $dbh;
+		$task_name = $request->get('task_name');
+		$task_description = $request->get('task_description');
+		$task_date_finish = $request->get('task_date_finish');
+		$task_date_create = date("Y-m-d H:i:s");
+
+		if(preg_match("|[\\<>'\"-/]+|", $task_name)) {
+		    return "<div class=\"alert alert-dismissible alert-warning\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Ошибка! </strong> В названии используются недопустимые символы!
+					</div>";
+		 }else{
+			if(preg_match("|[\\<>'\"-/]+|", $task_description)) {
+				return "<div class=\"alert alert-dismissible alert-warning\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Ошибка! </strong> В описании используются недопустимые символы!
+					</div>";
+			}else{
+					
+			$sql = "INSERT INTO tasks (t_name, t_description, t_type, t_date_create, t_date_finish) VALUES (:t_name, :t_description, :t_type, :t_date_create, :t_date_finish)";
+			$stm = $dbh->prepare($sql);
+			$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_type' => $task_type, ':t_date_create' => $task_date_create, ':t_date_finish' => $task_date_finish));
+
+			$sql = "SELECT * FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
+			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+			$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $task_date_create));
+			$result_task = $sth->fetch(PDO::FETCH_ASSOC);
+
+			$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
+			$stm = $dbh->prepare($sql);
+			$write_a_task = $stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $_SESSION['user']['u_id'], ':ut_role_exec' => 2));
+
+			return "<div class=\"alert alert-dismissible alert-success\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Замечательно! </strong> Задача " . $task_name . " успешно создана!
+					</div>";
+			
+			}
+		}
+	}
 ?>

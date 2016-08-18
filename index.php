@@ -96,6 +96,10 @@ $app->match('/logout', function() use ($app) {
 });
 
 $app->match('/upload/tasks/all', function(Request $request) use ($app) {
+	return import_tasks($request);
+});
+
+$app->match('/export/tasks/one', function(Request $request) use ($app) {
 	return export_tasks($request);
 });
 

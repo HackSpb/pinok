@@ -11,8 +11,31 @@
 			<div class="row main_block_special">
 				<div class="col-xs-12 col-sm-12 col-md-8 block_of_task">
 					<div class="user-auth-main-block">
-						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button>
+						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button> <button onclick="$('#new_task').slideToggle('slow');" href="javascript://">Создать себе задачу</button>
 						<div class="col-xs-12 col-sm-12 col-md-12">
+							<div id="new_task" style="display:none">
+							<form id="create_task">
+								<div class="form-group">
+									<label for="task_name" class="col-sm-3 control-label">Название задачи</label>
+									<div class="col-sm-9">
+										<input type="text" name="task_name" id="task_name" required>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="task_description" class="col-sm-3 control-label">Описание задачи</label>
+									<div class="col-sm-9">
+										<textarea type="text" name="task_description" rows="5" class="form-control" id="task_description" required></textarea>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="task_date_finish" class="col-sm-3 control-label">Дата конца</label>
+									<div class="col-sm-9">
+										<input type="date" name="task_date_finish" id="task_date_finish" required>
+									</div>
+								</div>
+								<center><input onclick="create_task(); document.getElementById('create_task').reset(); $('#new_task').slideToggle('slow');; return false;" type="button" value="Создать"></center>
+							</form>
+							</div>
 							<div id="tasks"></div>
 							<div id="page" align="center"></div>
 						</div>
@@ -104,6 +127,23 @@
 				});		
 			}
 				
+			function create_task(){
+				var task_name = $('#task_name').val();
+				var task_description = $('#task_description').val();
+				var task_type = $('#task_type').val();
+				var task_date_finish = $('#task_date_finish').val();
+				var query = "task_name="+task_name+"&task_description="+task_description+"&task_type="+task_type+"&task_date_finish="+task_date_finish;
+				$.ajax({
+					type: "POST",
+					url: "export/tasks/one",
+					data: query,
+					success: function(answer) {
+						$("#answer").html(answer);
+					}
+				});
+			}
+				
+				
 			$(document).ready(function(){
 			var y = location.search;
 			$.getJSON("/upload/tasks/all"+y,
@@ -111,11 +151,12 @@
 				console.log(data);
 				var countall = data['count_all'];
 				var lim = data['lim'];
+				var task = data['task_type'];
 				var page = countall/lim;
 				var newpage = Math.ceil(page);
 				var z;
 				for (z=1; z<=newpage; z++) {
-					$('#page').append("<a onclick=\"sendData('"+y+"&page="+z+"');\" href=\"javascript://\"><button>"+z+"</button></a>");  
+					$('#page').append("<a onclick=\"sendData('?task="+task+"&page="+z+"');\" href=\"javascript://\"><button>"+z+"</button></a>");  
 				}
 				var i;  
 				for (i=0;i<=lim;i++) {
