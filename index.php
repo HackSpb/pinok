@@ -59,7 +59,41 @@ $app->before(function ($request) use ($app) {
     $app['twig']->addGlobal('active', $request->get("_route"));
 });
 
+//for script
+$app->match('/code_for_send_task', function(Request $request) use ($app) {
+	return code_for_send_task($app, $request);
+});
 
+$app->match('/logout', function() use ($app) {
+	logout();
+	$redirect_url = "/";
+	header('HTTP/1.1 200 OK');
+	header('Location: http://'.$_SERVER['HTTP_HOST'].$redirect_url);
+	exit;
+});
+
+$app->match('/task/select/special', function(Request $request) use ($app) {
+	return task_select($request);
+});
+
+$app->match('/task/add/new', function(Request $request) use ($app) {
+	return task_add_new($request);
+});
+
+$app->match('/task/send/for_other', function(Request $request) use ($app) {
+	return send_task($app, $request);
+});
+
+$app->match('/task/update/status', function(Request $request) use ($app) {
+	return update_task_status($request);
+});
+
+$app->match('/task/statistics/select', function(Request $request) use ($app) {
+	return statistics_tasks($request);
+});
+
+
+//for web
 $app->match('/', function(Request $request) use ($app) {
 	unset($_SESSION['registration']);
 	if (isset($_SESSION['user'])) {
@@ -83,30 +117,6 @@ $app->match('/registration/success', function() use ($app) {
 	return $app['twig']->render('registration_success.twig', array('session_user' => $_SESSION['user'], 'session_registration' => $_SESSION['registration']));
 });
 
-$app->match('/code_for_send_task', function(Request $request) use ($app) {
-	return code_for_send_task($app, $request);
-});
-
-$app->match('/logout', function() use ($app) {
-	logout();
-	$redirect_url = "/";
-	header('HTTP/1.1 200 OK');
-	header('Location: http://'.$_SERVER['HTTP_HOST'].$redirect_url);
-	exit;
-});
-
-$app->match('/upload/tasks/all', function(Request $request) use ($app) {
-	return import_tasks($request);
-});
-
-$app->match('/export/tasks/one', function(Request $request) use ($app) {
-	return export_tasks($request);
-});
-
-$app->match('/get/new_task', function(Request $request) use ($app) {
-	return send_task($app, $request);
-});
-
 $app->match('/activation/{activation}', function($activation) use ($app) {
 	$activation_user = activation($activation);
 	return $app['twig']->render('activation.twig', array('activation' => $activation_user, 'session_user' => $_SESSION['user']));
@@ -115,10 +125,10 @@ $app->match('/activation/{activation}', function($activation) use ($app) {
 $app->match('/id{u_id}', function(Request $request, $u_id) use ($app) {
 	$role = analyzer($u_id);
 	if ($role == 404) {
-		return $app['twig']->render('error.twig', array('code' => $code));
+		return $app['twig']->render('error.twig', array('code' => $role, 'session_user' => $_SESSION['user']));
 		exit();
 	}
-	return $app['twig']->render('user.twig', array('template' => $role, 'session_user' => $_SESSION['user']));
+	return $app['twig']->render('user.twig', array('template' => $role['template'], 'user' => $role, 'session_user' => $_SESSION['user']));
 });
 
 $app->run();

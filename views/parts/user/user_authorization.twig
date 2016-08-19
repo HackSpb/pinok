@@ -10,41 +10,39 @@
 		<div class="container home-box-body">
 			<div class="row main_block_special">
 				<div class="col-xs-12 col-sm-12 col-md-8 block_of_task">
-					<div class="user-auth-main-block">
+					<div class="user_auth_main_block">
 						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button> <button onclick="$('#new_task').slideToggle('slow');" href="javascript://">Создать себе задачу</button>
-						<div class="col-xs-12 col-sm-12 col-md-12">
-							<div id="new_task" style="display:none">
-							<form id="create_task">
-								<div class="form-group">
-									<label for="task_name" class="col-sm-3 control-label">Название задачи</label>
-									<div class="col-sm-9">
-										<input type="text" name="task_name" id="task_name" required>
-									</div>
+					</div>
+					<div id="new_task" class="user_form_new_task" style="display:none">
+						<form id="create_task" class="form-horizontal" >
+							<div class="form-group">
+								<label for="task_name" class="col-sm-3 control-label">Название задачи</label>
+								<div class="col-sm-9">
+									<input type="text" name="task_name" id="task_name" required>
 								</div>
-								<div class="form-group">
-									<label for="task_description" class="col-sm-3 control-label">Описание задачи</label>
-									<div class="col-sm-9">
-										<textarea type="text" name="task_description" rows="5" class="form-control" id="task_description" required></textarea>
-									</div>
-								</div>
-								<div class="form-group">
-									<label for="task_date_finish" class="col-sm-3 control-label">Дата конца</label>
-									<div class="col-sm-9">
-										<input type="date" name="task_date_finish" id="task_date_finish" required>
-									</div>
-								</div>
-								<center><input onclick="create_task(); document.getElementById('create_task').reset(); $('#new_task').slideToggle('slow');; return false;" type="button" value="Создать"></center>
-							</form>
 							</div>
-							<div id="tasks"></div>
-							<div id="page" align="center"></div>
-						</div>
-					</div>					
-				</div>
+							<div class="form-group">
+								<label for="task_description" class="col-sm-3 control-label">Описание задачи</label>
+								<div class="col-sm-9">
+									<textarea type="text" name="task_description" rows="5" class="form-control" id="task_description" required></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="task_date_finish" class="col-sm-3 control-label">Дата конца</label>
+								<div class="col-sm-9">
+									<input type="date" name="task_date_finish" id="task_date_finish" required>
+								</div>
+							</div>
+							<center><input onclick="create_task(); document.getElementById('create_task').reset(); $('#new_task').slideToggle('slow');; return false;" type="button" value="Создать"></center>
+						</form>
+					</div>
+					<div id="tasks"></div>
+					<div id="page" align="center"></div>
+				</div>				
 				<div class="col-xs-12 col-sm-12 col-md-4">
 					<div class="user-auth-add-task-to-friend-block">
 						<h3 align="center">Создать задачу для другого человека</h3>
-						<form class="form-horizontal" method="post" action="">
+						<form class="form-horizontal">
 							<div class="form-group">
 								<label for="email_friend" class="col-sm-2 control-label">Email</label>
 								<div class="col-sm-10">
@@ -68,29 +66,28 @@
 								<input type="button" onclick="send_task();" class="btn btn-success" value="Отправить задачу">
 								<a onclick="$('#special_param').slideToggle('slow');" href="javascript://">Дополнительные параметры</a>
 								<div id="special_param" style="display:none">
-							<div class="form-group">
-								<label for="description" class="col-sm-3 control-label">Пометка</label>
-								<div class="col-sm-9">
-									<textarea type="text" name="description" rows="5" class="form-control" id="description"></textarea>
+									<div class="form-group">
+										<label for="description" class="col-sm-3 control-label">Пометка</label>
+										<div class="col-sm-9">
+											<textarea type="text" name="description" rows="5" class="form-control" id="description"></textarea>
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="deadline" class="col-sm-3 control-label">Конечный срок</label>
+										<div class="col-sm-9">
+											<input type="date" name="deadline" class="form-control" id="deadline" required>
+										</div>
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label for="deadline" class="col-sm-3 control-label">Конечный срок</label>
-								<div class="col-sm-9">
-									<input type="date" name="deadline" class="form-control" id="deadline" required>
-								</div>
-							</div>
-								</div>
-							</div>
-							
+							</div>		
 						</form>
 						<div id="answer_code_send"></div>
 						<div id="answer"></div>
 					</div>					
 				</div>
-			</div>
-			{% include 'parts/overall/footer.twig' %}
+			</div>		
 		</div>
+		{% include 'parts/overall/footer.twig' %}
 		<script>		
 			function code_for_send_task(){
 				var email_friend = $('#email_friend').val();
@@ -119,7 +116,7 @@
 				var query = "email_friend="+email_friend+"&task="+task+"&code="+code+"&description="+description+"&deadline="+deadline;				
 				$.ajax({
 					type: "POST",
-					url: "get/new_task",
+					url: "/task/send/for_other",
 					data: query,
 					success: function(answer) {
 						$("#answer").html(answer);
@@ -135,7 +132,7 @@
 				var query = "task_name="+task_name+"&task_description="+task_description+"&task_type="+task_type+"&task_date_finish="+task_date_finish;
 				$.ajax({
 					type: "POST",
-					url: "export/tasks/one",
+					url: "/task/add/new",
 					data: query,
 					success: function(answer) {
 						$("#answer").html(answer);
@@ -146,7 +143,7 @@
 				
 			$(document).ready(function(){
 			var y = location.search;
-			$.getJSON("/upload/tasks/all"+y,
+			$.getJSON("/task/select/special"+y,
 			function(data){
 				console.log(data);
 				var countall = data['count_all'];
@@ -161,13 +158,39 @@
 				var i;  
 				for (i=0;i<=lim;i++) {
 					if ( [('number_' + i)] in data ) {
-					$('#tasks').append("<div id='lvlup_1_id"+i+"'><p>"+data[('number_' + i)]['t_name']+"</p><p>"+data[('number_' + i)]['t_description']+"</p><p>"+data[('number_' + i)]['t_date_create']+"</p><p>"+data[('number_' + i)]['t_date_finish']+"</p><hr><div id='task_lvl_2_" + i + "'></div></div>"); 
+						var status = data[('number_' + i)]['t_status'];
+						if (status == 1 && task!='from_others') {
+							var status_text = "<font class='task_status_color_active'>Активна</font>";
+							var check = "<div class='col-md-3'>Задача выполнена: <center><button onclick='change_status_task();' id='change_status' value='"+data[('number_' + i)]['t_id']+"'>✓</button></center></div>";
+						} else if (status == 1 && task=='from_others') {
+							var status_text = "<font class='task_status_color_active'>Активна</font>";
+							var check = "";
+						} else if (status == 0) {
+							var status_text = "<font class='task_status_color_no_active'>Выполнена</font>";
+							var check = "";
+						}
+					$('#tasks').append("<div id='lvlup_1_id"+i+"' class='user_tasks_blocks col-md-12'><div class='col-md-9'><p><font class='task_name_p'>Название: </font>"+data[('number_' + i)]['t_name']+"</p><p><font class='task_name_p'>Описание: </font>"+data[('number_' + i)]['t_description']+"</p><p><font class='task_name_p'>Дата создания: </font>"+data[('number_' + i)]['t_date_create']+"</p><p><font class='task_name_p'>Дата финала: </font>"+data[('number_' + i)]['t_date_finish']+"</p><p><font class='task_name_p'>Статус задачи: </font>"+status_text+"</p></div>"+check+"<div id='task_lvl_2_" + i + "'></div></div>"); 
 				}}}
 		)});
 			
 		function sendData (sData) {
 			location.search = sData;
 		} 
+		
+		function change_status_task(){
+			var	number = $('#change_status').val();
+			var query ="number="+number;
+			$.ajax({
+				type: "POST",
+				url: "/task/update/status",
+				data: query,
+				success: function(answer) {
+						if (answer==1){
+							location.reload();
+						}
+				}			
+			});
+		}	
 		</script>
 	</body>
 </html>

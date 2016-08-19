@@ -164,14 +164,18 @@ function registration ($request, $app){
 		if ($result == TRUE) {		
 			if ($_SESSION['user'] == TRUE) {
 				if ($_SESSION['user']['u_id'] == $u_id) {
-					return "authorization";
+					$user['template'] = "authorization";
+					return $user;
 					exit();
 				} else {
-					return "non_authorization";
+					$user = $result;
+					$user['template'] = "non_authorization";
+					return $user;
 					exit();
 				}				
-			} else {					
-				return "guest";
+			} else {			
+				$user['template'] = "guest";
+				return $user;		
 				exit();
 			}
 		} else {
@@ -179,7 +183,8 @@ function registration ($request, $app){
 			exit();
 		}
 		if(isset($_COOKIE['auth_key']) AND $_COOKIE['auth_key']==$result['u_auth_key']) {
-			return "authorization";
+			$user['template'] = "authorization";
+			return $user;
 			exit();
 		}	
 	}
@@ -293,23 +298,24 @@ function registration ($request, $app){
 		}
 	}
 
-	function import_tasks ($request) {
-		$lim = 5;	//count of product on one page
+	function task_select ($request) {
+		global $config;
+		$lim = $config['settings']['count_task_on_one_page'];	//count of product on one page
 		$page = $request->get('page');
 		$task_type = $request->get('task');
 		if (!isset($task_type)) $task_type='own_all';
 		if ($task_type == 'own_all') {
 			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and u_id=? ORDER BY t_date_create DESC LIMIT ?,?";			
+			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and u_id=? ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";			
 		} elseif ($task_type == 'own') {
 			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id=:u_id and ut_role=1)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_id in (select t_id from users_tasks where u_id=? and ut_role=1) ORDER BY t_date_create DESC LIMIT ?,?";	
+			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_id in (select t_id from users_tasks where u_id=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
 		} elseif ($task_type == 'other') {
 			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_date_create DESC LIMIT ?,?";	
+			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
 		} elseif ($task_type == 'from_others') {
 			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=2) ORDER BY t_date_create DESC LIMIT ?,?";	
+			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=2) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
 		} else {
 			$result['number_0']['t_name'] = 'Ошибка!';
 			return json_encode ($result);
@@ -351,8 +357,7 @@ function registration ($request, $app){
 	}
 
 
-	function export_tasks($request){
-
+	function task_add_new($request){
 		global $dbh;
 		$task_name = $request->get('task_name');
 		$task_description = $request->get('task_description');
@@ -392,5 +397,55 @@ function registration ($request, $app){
 			
 			}
 		}
+	}
+
+	function update_task_status($request) {
+		global $dbh;
+		$t_id = $request->get('number');
+		$sql = "UPDATE tasks SET t_status = 0 WHERE t_id in (select t_id from users_tasks where t_id = :t_id and ut_role=2 and u_id=:u_id)";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':t_id' => $t_id, ':u_id' => $_SESSION['user']['u_id']));
+		return 1;
+	}
+
+	function statistics_tasks ($request){
+		global $dbh;
+		$u_id = $request->get('id');
+		
+		$sql = "SELECT * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id=:u_id and ut_role=1)";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $u_id));
+		$result_author_executer = $sth->fetch(PDO::FETCH_ASSOC);
+		$count_result_author_executer = count($result_author_executer);
+
+		$sql = "SELECT * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id=:u_id and ut_role=1) and t_status=1";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $u_id));
+		$result_author_executer_active = $sth->fetch(PDO::FETCH_ASSOC);
+		$count_result_author_executer_active = count($result_author_executer_active);
+
+
+
+		$sql = "SELECT * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2)";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $u_id));
+		$result_author_noexecuter = $sth->fetch(PDO::FETCH_ASSOC);
+		$count_result_author_noexecuter = count($result_author_noexecuter);
+
+		$sql = "SELECT * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2) and t_status=1";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $u_id));
+		$result_author_noexecuter_active = $sth->fetch(PDO::FETCH_ASSOC);
+		$count_result_author_noexecuter_active = count($result_author_noexecuter_active);
+
+		$all_task_author = $count_result_author_executer + $count_result_author_noexecuter;
+
+		$statistics['a_e']=$count_result_author_executer;
+		$statistics['a_e_a']=$count_result_author_executer_active;
+		$statistics['a_ne']=$count_result_author_noexecuter;
+		$statistics['a_ne_a']=$count_result_author_noexecuter_active;
+		$statistics['a_a']=$all_task_author;
+
+		return json_encode($statistics); 
 	}
 ?>

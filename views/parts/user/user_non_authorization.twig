@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		{% include 'parts/overall/head.twig' %}
+	</head>
+	<header>
+		{% include 'parts/overall/header.twig' %}
+	</header> 
+	<body>
+		<div class="container home-box-body">
+			<div class="row main_block_special">
+				<div class="col-md-12">
+					<div class="col-md-4">
+						<img src="/img/{{user.u_avatar}}" class="thumbnail" width=300px height=300px>
+					</div>
+					<div class="col-md-8">
+						<div ckass="row">
+							<div class="col-md-12">
+								{%if user.u_name == true%} <p>Имя пользователя: {{user.u_name}}</p> {%endif%}							
+								{%if user.u_surname == true%} <p>Фамилия пользователя: {{user.u_surname}}</p> {%endif%}							
+								{%if user.u_city == true%}<p>Город: {{user.u_city}}</p> {%endif%}															
+								<p>Дата регистрации: {{user.u_date_registration}}</p>
+							</div>						
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<p>Всего задач поставленно: <font id="count_task"></font></p>
+								<div id="all_tasks"></div>								
+								<br>
+								<p>Выполено своих задач: </p>
+								<div id="personal_task"></div>
+								<br>
+								<p>Выполнено задач другими пользователями: </p>
+								<div id="other_task"></div>
+							</div>						
+						</div>
+					</div>
+				</div>
+			</div>		
+		</div>	
+		{% include 'parts/overall/footer.twig' %}
+		<script>
+			
+		$(document).ready(function(){
+			var y = location.pathname;
+			var u = "?id="+y.substring(3);
+			$.getJSON("/task/statistics/select"+u,
+			function(data){
+				console.log(data);
+				var a_e =  data['a_e'];
+				var a_e_a =  data['a_e_a'];
+				var a_ne =  data['a_ne'];
+				var a_ne_a =  data['a_ne_a'];
+				var a_a =  data['a_a'];
+				
+				var first = a_e/a_a;
+				var second = 100 - first;
+				
+				var third = a_e_a/a_e;
+				var fourth = 100 - third;
+				
+				var fifth = a_ne_a/a_ne;
+				var sixth = 100 - fifth;
+
+				$('#count_task').append(a_a);
+				$('#all_tasks').append("<div class='progress progress-striped active'><div class='progress-bar progress-bar-success' style='width: "+first+"%'><span class='sr-only'>"+first+"% поставленных задач для себя</span></div><div class='progress-bar progress-bar-warning' style='width: "+second+"%'><span class='sr-only'>"+second+"% поставленных задач для других</span></div></div>");  
+				$('#personal_task').append("<div class='progress progress-striped active'><div class='progress-bar progress-bar-success' style='width: "+third+"%'><span class='sr-only'>"+third+"% поставленных задач для себя выполнено</span></div><div class='progress-bar progress-bar-warning' style='width: "+fourth+"%'><span class='sr-only'>"+fourth+"% поставленных задач для себя не выполнено</span></div></div>");  
+				$('#other_task').append("<div class='progress progress-striped active'><div class='progress-bar progress-bar-success' style='width: "+fifth+"%'><span class='sr-only'>"+fifth+"% поставленных задач для себя выполнено</span></div><div class='progress-bar progress-bar-warning' style='width: "+sixth+"%'><span class='sr-only'>"+sixth+"% поставленных задач для других не выполнено</span></div></div>");  
+				
+		})});
+		
+		</script>
+	</body>
+</html>
