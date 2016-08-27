@@ -16,7 +16,11 @@
 				{% include 'parts/home/home_slider.twig' %}
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3">
+				{%if session_user == TRUE%} 	
+					<center><a href="/id{{session_user.u_id}}"><h1>Перейти в личный кабинет</h1></a></center>
+				{%else%}
 				{% include 'parts/home/home_forma.twig' %}
+				{%endif%}
 				{% include 'parts/home/home_info_min.twig' %}
 				</div>
 			</div>

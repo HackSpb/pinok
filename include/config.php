@@ -18,6 +18,7 @@ $config['mail']['user'] = 'bramin90@gmail.com';
 $config['mail']['password'] = 'Nashlazyb';
 
 $config['settings']['count_task_on_one_page'] = 5;
+$config['settings']['template'] = 'default';
 
 return $config;
 ?>
