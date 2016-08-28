@@ -1,1 +1,3 @@
+#ignore databases' fails 
 *.sql
+*.sql~
