@@ -35,7 +35,7 @@ function registration ($request, $app){
 		}
 	}
 
-	if (count($error) > 0) {
+	if (count(@$error) > 0) {
 		return $error;
 		exit();
 	}
@@ -128,7 +128,7 @@ function authorization ($request){
 		 $in_remember = TRUE;
 	}
 
-	if (count($error) > 0) {
+	if (count(@$error) > 0) {
 		return $error;
 		exit();
 	}
@@ -156,7 +156,7 @@ function authorization ($request){
 			// Success!
 			$_SESSION["user"] = $result;
 			header('HTTP/1.1 200 OK');
-			header('Location: http://'.$_SERVER['HTTP_HOST'].'/id'.$result['u_id']);
+			header('Location: http://'.$_SERVER['HTTP_HOST'].'/');
 			exit();					
 		} else {
 		// Invalid credentials

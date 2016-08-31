@@ -125,6 +125,10 @@ $app->match('/activation/{activation}', function($activation) use ($app) {
 	return $app['twig']->render('activation.twig', array('activation' => $activation_user, 'session_user' => @$_SESSION['user']));
 });
 
+$app->match('/admin', function() use ($app) {
+	return $app['twig']->render('admin.twig', array('session_user' => @$_SESSION['user']));
+});
+
 $app->match('/id{u_id}', function(Request $request, $u_id) use ($app) {
 	$role = analyzer($u_id);
 	if ($role == 404) {

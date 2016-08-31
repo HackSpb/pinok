@@ -11,68 +11,57 @@
 			<div class="row main_block_special">
 				<div class="col-xs-12 col-sm-12 col-md-8 block_of_task">
 					<div class="user_auth_main_block">
-						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button> <button onclick="$('#new_task').slideToggle('slow');" href="javascript://">Создать себе задачу</button>
-					</div>
-					<div id="new_task" class="user_form_new_task" style="display:none">
-						<form id="create_task" class="form-horizontal" >
-							<div class="form-group">
-								<label for="task_name" class="col-sm-3 control-label">Название задачи</label>
-								<div class="col-sm-9">
-									<input type="text" name="task_name" id="task_name" required>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="task_description" class="col-sm-3 control-label">Описание задачи</label>
-								<div class="col-sm-9">
-									<textarea type="text" name="task_description" rows="5" class="form-control" id="task_description" required></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="task_date_finish" class="col-sm-3 control-label">Дата конца</label>
-								<div class="col-sm-9">
-									<input type="date" name="task_date_finish" id="task_date_finish" required>
-								</div>
-							</div>
-							<center><input onclick="create_task(); document.getElementById('create_task').reset(); $('#new_task').slideToggle('slow');; return false;" type="button" value="Создать"></center>
-						</form>
+						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button> 
 					</div>
 					<div id="tasks"></div>
 					<div id="page" align="center"></div>
 				</div>				
 				<div class="col-xs-12 col-sm-12 col-md-4">
 					<div class="user-auth-add-task-to-friend-block">
-						<h3 align="center">Создать задачу для другого человека</h3>
+						<h3 align="center">Создать задачу</h3>
 						<form class="form-horizontal">
 							<div class="form-group">
-								<label for="email_friend" class="col-sm-2 control-label">Email</label>
+								<label for="task_for" class="col-sm-2 control-label">Задача для:</label>
 								<div class="col-sm-10">
-									<input type="email" name="email_friend" class="form-control" id="email_friend" required>
+									<input type="radio" name="task_for" id="task_for_1" checked value="1"> Для себя<Br>
+   									<input type="radio" name="task_for" id="task_for_2" value="2"> Для другого<Br>
+								</div>
+							</div>
+							<div id="email"></div>						
+							<div class="form-group">
+								<label for="task_name" class="col-sm-2 control-label">Задача</label>
+								<div class="col-sm-10">
+									<input type="text" name="task_name" class="form-control" id="task_name" required>
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="task" class="col-sm-2 control-label">Задача</label>
-								<div class="col-sm-10">
-									<input type="text" name="task" class="form-control" id="task" required>
+								<label for="task_description" class="col-sm-3 control-label">Пометка</label>
+								<div class="col-sm-9">
+									<textarea type="text" name="task_description" rows="5" class="form-control" id="task_description"></textarea>
 								</div>
 							</div>
-							<div align="center">
-								<input type="button" onclick="send_task();" class="btn btn-success" value="Отправить задачу">
-								<p><a onclick="$('#special_param').slideToggle('slow');" href="javascript://">Дополнительные параметры</a></p>
-								<div id="special_param" style="display:none">
-									<div class="form-group">
-										<label for="description" class="col-sm-3 control-label">Пометка</label>
-										<div class="col-sm-9">
-											<textarea type="text" name="description" rows="5" class="form-control" id="description"></textarea>
-										</div>
-									</div>
-									<div class="form-group">
-										<label for="deadline" class="col-sm-3 control-label">Конечный срок</label>
-										<div class="col-sm-9">
-											<input type="date" name="deadline" class="form-control" id="deadline" required>
-										</div>
-									</div>
+							<div class="form-group">
+								<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
+								<div class="col-sm-9">
+									<input type="date" name="task_deadline" class="form-control" id="task_deadline" required>
 								</div>
-							</div>		
+							</div>	
+							{%if (session_user.u_tarif == 1) or (session_user.u_tarif == 2) or (session_user.u_tarif == 3) %}
+								{%include 'parts/user/user_authorization/email_settings.twig'%}
+							{%else%}
+								<center><p><a disabled>Настройки Email</a></p></center>
+							{%endif%}
+							{%if (session_user.u_tarif == 2) or (session_user.u_tarif == 3) %}
+								{%include 'parts/user/user_authorization/sms_settings.twig'%}
+							{%else%}
+								<center><p><a disabled>Настройки SMS</a></p></center>
+							{%endif%}
+							{%if session_user.u_tarif == 3 %}
+								{%include 'parts/user/user_authorization/call_settings.twig'%}
+							{%else%}
+								<center><p><a disabled>Настройки звонков</a></p></center>
+							{%endif%}
+							<center><input type="button" onclick="send_task();" class="btn btn-success" value="Создать"></center>
 						</form>
 						<div id="answer_code_send"></div>
 						<div id="answer"></div>
@@ -81,7 +70,21 @@
 			</div>		
 		</div>
 		{% include 'parts/overall/footer.twig' %}
-		<script>		
+		<script>
+			task_for_1.onfocus = function() {
+  				if (this.value == 1) { 
+  					this.className = "email";
+  					email.innerHTML = '';
+  				}
+			};		
+			task_for_2.onfocus = function() {
+  				if (this.value == 2) { 
+  					this.className = "email";
+  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-2 control-label">Email</label><div class="col-sm-10"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
+  				}
+			};
+
+		
 			function send_task(){
 				var email_friend = $('#email_friend').val();
 				var task = $('#task').val();

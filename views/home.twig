@@ -18,6 +18,15 @@
 				<div class="col-xs-12 col-sm-12 col-md-3">
 				{%if session_user == TRUE%} 	
 					<center><a href="/id{{session_user.u_id}}"><h1>Перейти в личный кабинет</h1></a></center>
+					{%if session_user.u_role == 2 %}
+					<center><a href="/admin"><h1>Панель редактора</h1></a></center>
+					{%endif%}
+					{%if session_user.u_role == 3 %}
+					<center><a href="/admin"><h1>Панель пинателя</h1></a></center>
+					{%endif%}
+					{%if session_user.u_role == 4 %}
+					<center><a href="/admin"><h1>Панель администратора</h1></a></center>
+					{%endif%}
 				{%else%}
 				{% include 'parts/home/home_forma.twig' %}
 				{%endif%}
