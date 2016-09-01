@@ -1,0 +1,9 @@
+{% if template == 'authorization' %}
+	{% include 'parts/user/user_authorization.twig' %}
+{% endif %}
+{% if template == 'guest' %}
+	{% include 'parts/user/user_guest.twig' %}
+{% endif %}
+{% if template == 'non_authorization' %}
+	{% include 'parts/user/user_non_authorization.twig' %}
+{% endif %}
