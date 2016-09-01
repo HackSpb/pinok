@@ -46,17 +46,17 @@
 									<input type="date" name="task_deadline" class="form-control" id="task_deadline" required>
 								</div>
 							</div>	
-							{%if (session_user.u_tarif == 1) or (session_user.u_tarif == 2) or (session_user.u_tarif == 3) %}
+							{%if session_user.u_tarif > 0 %}
 								{%include 'parts/user/user_authorization/email_settings.twig'%}
 							{%else%}
 								<center><p><a disabled>Настройки Email</a></p></center>
 							{%endif%}
-							{%if (session_user.u_tarif == 2) or (session_user.u_tarif == 3) %}
+							{%if session_user.u_tarif > 1 %}
 								{%include 'parts/user/user_authorization/sms_settings.twig'%}
 							{%else%}
 								<center><p><a disabled>Настройки SMS</a></p></center>
 							{%endif%}
-							{%if session_user.u_tarif == 3 %}
+							{%if session_user.u_tarif > 2 %}
 								{%include 'parts/user/user_authorization/call_settings.twig'%}
 							{%else%}
 								<center><p><a disabled>Настройки звонков</a></p></center>

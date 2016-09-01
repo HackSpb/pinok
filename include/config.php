@@ -6,10 +6,10 @@
 //
 
 $config['bd']['host'] = 'localhost';
-$config['bd']['dbname'] = 'MOTIVATOR';
+$config['bd']['dbname'] = 'PINOK';
 $config['bd']['charset'] = 'UTF8';
-$config['bd']['user'] = 'motiv';
-$config['bd']['passwoord'] = 'mypony';
+$config['bd']['user'] = 'root';
+$config['bd']['passwoord'] = '';
 $config['bd']['db_connect'] = 'mysql:host='.$config['bd']['host'].';dbname='.$config['bd']['dbname'].';charset='.$config['bd']['charset'];
 $config['mail']['host'] = 'smtp.gmail.com';
 $config['mail']['port'] = '465';

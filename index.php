@@ -2,6 +2,7 @@
 session_start();
 
 require 'include/config.php';
+if(file_exists('include/local.config.php')) include 'include/local.config.php';
 require 'include/main_func.php';
 
 $dbh = new PDO($config['bd']['db_connect'], $config['bd']['user'], $config['bd']['passwoord']);
@@ -21,7 +22,7 @@ $app = new Silex\Application();
 $app['debug'] = true;
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-	'twig.path' => __DIR__.'/views',
+	'twig.path' => __DIR__.'/templates/'.$config['settings']['template'].'/views',
 ));
 
 $app['twig'] = $app->share($app->extend('twig', function($twig, $app) {
