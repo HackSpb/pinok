@@ -1,26 +1,46 @@
 							<center><p><a onclick="$('#sms_settings').slideToggle('slow');" href="javascript://">Настройки SMS</a></p></center>
 								<div id="sms_settings" style="display:none">
 									<div class="form-group">
-										<label for="sms_rule" class="col-sm-3 control-label">Оповещать по SMS</label>
-										<div class="col-sm-9">
+										<label for="sms_rule" class="col-sm-5 control-label">Оповещать по SMS</label>
+										<div class="col-sm-7">
 											<input type="radio" name="sms_rule" id="sms_on" value="1">Да
    											<input type="radio" name="sms_rule" id="sms_off" checked value="0">Нет<Br>
 										</div>
 									</div>
-									<div id="sms_set"></div>
+									<div id="sms_set"></div><div id="time_once_sms" class="time_once_sms"></div>
 								</div>
 
-							<script>
-								sms_on.onfocus = function() {
-					  				if (this.value == 1) { 
-					  					this.className = "sms_set";
-					  					sms_set.innerHTML = '<div class="form-group"><center><div class="col-sm-12"><select name="sms_frequency"><option selected disabled>Частота повторения</option><option value="1">Раз в день</option><option value="2">Раз в день (пн-пт)</option><option value="3">Раз в неделю</option><option value="4">Раз в месяц</option><option value="5">Раз в год</option></select></div></center></div><div class="form-group"><center><div class="col-sm-12"><select name="sms_time"><option selected disabled>Время оповещения</option><option value="7">7:00</option><option value="8">8:00</option><option value="9">9:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option><option value="22">22:00</option><option value="23">23:00</option></select></div></center></div>';
-					  				}
-								};		
-								sms_off.onfocus = function() {
-					  				if (this.value == 0) { 
-					  					this.className = "sms_set";
-					  					sms_set.innerHTML = '';
-					  				}
-								};
-							</script>
+						<script>
+							sms_on.onfocus = function() {
+				  				if (this.value == 1) { 
+				  					this.className = "sms_set";
+				  					sms_set.innerHTML = '<div class="form-group"><label for="sms_once" class="col-sm-5 control-label">Напомнить за:</label><div class="col-sm-7"><select name="sms_once" id="sms_once"><option  value="0" selected>Нет</option><option value="1">за 1 час</option><option value="2">за 2 часа</option><option value="3">за 3 часа</option><option value="4">за 4 часа</option></select></div></div><div class="form-group"><label for="sms_frequency" class="col-sm-5 control-label">Частота напоминания:</label><div class="col-sm-7"><select name="sms_frequency" id="sms_frequency" onchange="turn_time_sms();"><option  value="0" selected>Нет</option><option value="1">Раз в день</option><option value="2">Раз в день (пн-пт)</option><option value="3">Раз в неделю</option><option value="4">Раз в месяц</option><option value="5">Раз в год</option></select></div></div>';
+				  				}
+							};		
+							sms_off.onfocus = function() {
+				  				if (this.value == 0) { 
+				  					this.className = "sms_set";
+				  					sms_set.innerHTML = '';
+				  					this.className = "time_once_sms";
+				  					time_once_sms.innerHTML = '';
+				  				}
+							};
+
+							function turn_time_sms() {
+								var sms_frequency = $('#sms_frequency').val();
+								if (sms_frequency == 1 || sms_frequency == 2) {
+									time_once_sms.innerHTML = '';
+									$('#time_once_sms').append('<div class="form-group"><label for="sms_time" class="col-sm-5 control-label">Время оповещения:</label><div class="col-sm-7"><select name="sms_time" id="sms_time">{% for i in 7..11 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}<option value="12" selected>12:00</option>{% for i in 13..23 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></div></div>');
+								} else if (sms_frequency == 3) {
+									time_once_sms.innerHTML = '';
+									$('#time_once_sms').append('<div class="form-group"><label for="sms_time" class="col-sm-5 control-label">Время оповещения:</label><div class="col-sm-7"><select name="sms_time" id="sms_time">{% for i in 7..11 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}<option value="12" selected>12:00</option>{% for i in 13..23 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></div></div><div class="form-group"><label for="sms_week" class="col-sm-5 control-label">День недели:</label><div class="col-sm-7"><select name="sms_week" id="sms_week"><option value="1" selected>Понедельник</option><option value="2">Вторник</option><option value="3">Среда</option><option value="4">Четверг</option><option value="5">Пятница</option><option value="6">Суббота</option><option value="7">Воскресенье</option></select></div></div>');
+								} else if (sms_frequency == 4) {
+									time_once_sms.innerHTML = '';
+									$('#time_once_sms').append('<div class="form-group"><label for="sms_time" class="col-sm-5 control-label">Время оповещения:</label><div class="col-sm-7"><select name="sms_time" id="sms_time">{% for i in 7..11 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}<option value="12" selected>12:00</option>{% for i in 13..23 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></div></div><div class="form-group"><label for="sms_day" class="col-sm-5 control-label">Дата:</label><div class="col-sm-7"><select name="sms_day" id="sms_day"><option value="1" selected>1</option>{% for i in 2..31 %}<option value="{{ i }}">{{ i }}</option>{% endfor %}</select></div></div>');
+								} else if (sms_frequency == 5) {
+									time_once_sms.innerHTML = '';
+									$('#time_once_sms').append('<div class="form-group"><label for="sms_time" class="col-sm-5 control-label">Время оповещения:</label><div class="col-sm-7"><select name="sms_time" id="sms_time">{% for i in 7..11 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}<option value="12" selected>12:00</option>{% for i in 13..23 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></div></div><div class="form-group"><label for="sms_day" class="col-sm-5 control-label">Дата:</label><div class="col-sm-7"><select name="sms_day" id="sms_day"><option value="1" selected>1</option>{% for i in 2..31 %}<option value="{{ i }}">{{ i }}</option>{% endfor %}</select></div></div><div class="form-group"><label for="sms_month" class="col-sm-5 control-label">Месяц:</label><div class="col-sm-7"><select name="sms_month" id="sms_month"><option value="1" selected>Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select></div></div>');
+								}
+
+							};
+						</script>

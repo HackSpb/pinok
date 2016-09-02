@@ -1,6 +1,6 @@
 <?php
 
-	function send_task ($app, $request) {
+	function create_task ($app, $request) {
 		$email_friend = $request->get('email_friend');
 		$task = $request->get('task');
 		$code = $request->get('code');

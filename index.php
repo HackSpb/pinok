@@ -75,12 +75,8 @@ $app->match('/task/select/special', function(Request $request) use ($app) {
 	return task_select($request);
 });
 
-$app->match('/task/add/new', function(Request $request) use ($app) {
-	return task_add_new($request);
-});
-
-$app->match('/task/send/for_other', function(Request $request) use ($app) {
-	return send_task($app, $request);
+$app->match('/task/create/universal', function(Request $request) use ($app) {
+	return create_task($app, $request);
 });
 
 $app->match('/task/update/status', function(Request $request) use ($app) {
