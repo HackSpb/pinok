@@ -43,7 +43,7 @@
 							<div class="form-group">
 								<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
 								<div class="col-sm-9">
-									<input type="date" name="task_deadline" class="form-control" id="task_deadline" required>
+									<input type="datetime" name="task_deadline" class="form-control" id="task_deadline" required>
 								</div>
 							</div>	
 							{%if session_user.u_tarif > 0 %}
@@ -51,12 +51,12 @@
 							{%else%}
 								<center><p><a disabled>Настройки Email</a></p></center>
 							{%endif%}
-							{%if session_user.u_tarif > 1 %}
+							{%if session_user.u_tarif > 0 %}
 								{%include 'parts/user/user_authorization/sms_settings.twig'%}
 							{%else%}
 								<center><p><a disabled>Настройки SMS</a></p></center>
 							{%endif%}
-							{%if session_user.u_tarif > 2 %}
+							{%if session_user.u_tarif > 0 %}
 								{%include 'parts/user/user_authorization/call_settings.twig'%}
 							{%else%}
 								<center><p><a disabled>Настройки звонков</a></p></center>
@@ -100,7 +100,7 @@
 				var email_day = $('#email_day').val();
 				var email_month = $('#email_month').val();
 				{%endif%}
-				{%if session_user.u_tarif > 1 %}
+				{%if session_user.u_tarif > 0 %}
 				var sms_rule = $('input:radio[name=sms_rule]:checked').val();
 				var sms_once = $('#sms_once').val();
 				var sms_frequency = $('#sms_frequency').val();				
@@ -109,7 +109,7 @@
 				var sms_day = $('#sms_day').val();
 				var sms_month = $('#sms_month').val();
 				{%endif%}
-				{%if session_user.u_tarif > 2 %}
+				{%if session_user.u_tarif > 0 %}
 				var call_rule = $('input:radio[name=call_rule]:checked').val();
 				var call_style = $('#call_style').val();
 				var call_once = $('#call_once').val();
@@ -119,14 +119,12 @@
 				var call_day = $('#call_day').val();
 				var call_month = $('#call_month').val();
 				{%endif%}
-				var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_description="+task_description+"&task_deadline="+task_deadline{%if session_user.u_tarif > 0 %}+"&email_rule="+email_rule+"&email_frequency="+email_frequency+"&email_time="+email_time{%endif%}{%if session_user.u_tarif > 1 %}+"&sms_rule="+sms_rule+"&sms_once="+sms_once+"&sms_frequency="+sms_frequency+"&sms_time="+sms_time+"&sms_week="+sms_week+"&sms_day="+sms_day+"&sms_month="+sms_month{%endif%}{%if session_user.u_tarif > 2 %}+"&call_rule="+call_rule+"&call_style="+call_style+"&call_once="+call_once+"&call_frequency="+call_frequency+"&call_time="+call_time+"&call_week="+call_week+"&call_day="+call_day+"&call_month="+call_month{%endif%};	
-				alert(query);			
+				var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_description="+task_description+"&task_deadline="+task_deadline{%if session_user.u_tarif > 0 %}+"&email_rule="+email_rule+"&email_once="+email_once+"&email_frequency="+email_frequency+"&email_time="+email_time+"&email_week="+email_week+"&email_day="+email_day+"&email_month="+email_month{%endif%}{%if session_user.u_tarif > 0 %}+"&sms_rule="+sms_rule+"&sms_once="+sms_once+"&sms_frequency="+sms_frequency+"&sms_time="+sms_time+"&sms_week="+sms_week+"&sms_day="+sms_day+"&sms_month="+sms_month{%endif%}{%if session_user.u_tarif > 0 %}+"&call_rule="+call_rule+"&call_style="+call_style+"&call_once="+call_once+"&call_frequency="+call_frequency+"&call_time="+call_time+"&call_week="+call_week+"&call_day="+call_day+"&call_month="+call_month{%endif%};	
 				$.ajax({
 					type: "POST",
 					url: "/task/create/universal",
 					data: query,
 					success: function(answer) {
-						render_task();
 						$("#answer").html(answer);
 					}
 				});		

@@ -1,13 +1,43 @@
 <?php
 
 	function create_task ($app, $request) {
-		$email_friend = $request->get('email_friend');
-		$task = $request->get('task');
-		$code = $request->get('code');
-		$description = $request->get('description');
-		$deadline = $request->get('deadline');
+		$task_for = ($request->get('task_for') == 'undefined') ? NULL : $request->get('task_for');
+		$email_friend = ($request->get('email_friend') == 'undefined') ? NULL : $request->get('email_friend');
+		$task_name = ($request->get('task_name') == 'undefined') ? NULL : $request->get('task_name');
+		$task_description = ($request->get('task_description') == 'undefined') ? NULL : $request->get('task_description');
+		$task_deadline = ($request->get('task_deadline') == 'undefined') ? NULL : $request->get('task_deadline');
+
+		$email_rule = ($request->get('email_rule') == 'undefined') ? NULL : $request->get('email_rule');
+		$email_once = ($request->get('email_once') == 'undefined') ? NULL : $request->get('email_once');
+		$email_frequency = ($request->get('email_frequency') == 'undefined') ? NULL : $request->get('email_frequency');
+		$email_time = ($request->get('email_time') == 'undefined') ? NULL : $request->get('email_time');
+		$email_week = ($request->get('email_week') == 'undefined') ? NULL : $request->get('email_week');
+		$email_day = ($request->get('email_day') == 'undefined') ? NULL : $request->get('email_day');
+		$email_month = ($request->get('email_month') == 'undefined') ? NULL : $request->get('email_month');
+
+		$sms_rule = ($request->get('sms_rule') == 'undefined') ? NULL : $request->get('sms_rule');
+		$sms_once = ($request->get('sms_once') == 'undefined') ? NULL : $request->get('sms_once');
+		$sms_frequency = ($request->get('sms_frequency') == 'undefined') ? NULL : $request->get('sms_frequency');
+		$sms_time = ($request->get('sms_time') == 'undefined') ? NULL : $request->get('sms_time');
+		$sms_week = ($request->get('sms_week') == 'undefined') ? NULL : $request->get('sms_week');
+		$sms_day = ($request->get('sms_day') == 'undefined') ? NULL : $request->get('sms_day');
+		$sms_month = ($request->get('sms_month') == 'undefined') ? NULL : $request->get('sms_month');
+
+		$call_rule = ($request->get('call_rule') == 'undefined') ? NULL : $request->get('call_rule');
+		$call_style = ($request->get('call_style') == 'undefined') ? NULL : $request->get('call_style');
+		$call_once = ($request->get('call_once') == 'undefined') ? NULL : $request->get('call_once');
+		$call_frequency = ($request->get('call_frequency') == 'undefined') ? NULL : $request->get('call_frequency');
+		$call_time = ($request->get('call_time') == 'undefined') ? NULL : $request->get('call_time');
+		$call_week = ($request->get('call_week') == 'undefined') ? NULL : $request->get('call_week');
+		$call_day = ($request->get('call_day') == 'undefined') ? NULL : $request->get('call_day');
+		$call_month = ($request->get('call_month') == 'undefined') ? NULL : $request->get('call_month');
+		
 		$t_date_create = date("Y-m-d H:i:s");
-		if ($code == $_SESSION['code_for_send_task']) {
+
+
+		//return $task_for.'<br>'.$email_friend.'<br>'.$task_name.'<br>'.$task_description.'<br>'.$task_deadline.'<br>'.$email_rule.'<br>'.$email_once.'<br>'.$email_frequency.'<br>'.$email_time.'<br>'.$email_week.'<br>'.$email_day.'<br>'.$email_month.'<br>'.$sms_rule.'<br>'.$sms_once.'<br>'.$sms_frequency.'<br>'.$sms_time.'<br>'.$sms_week.'<br>'.$sms_day.'<br>'.$sms_month.'<br>'.$call_rule.'<br>'.$call_style.'<br>'.$call_once.'<br>'.$call_frequency.'<br>'.$call_time.'<br>'.$call_week.'<br>'.$call_day.'<br>'.$call_month;
+			
+
 			global $dbh;
 			$sql = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2) and t_date_create > NOW() - INTERVAL 1 DAY";
 			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -81,12 +111,6 @@
 						<strong>Внимание! </strong> Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через ".$time_waiting->format('Y-m-d H:i:s')."<br>Последние задачи, которые Вы составили:<br>".$result[0]['t_name']."<br>".$result[1]['t_name']."<br>".$result[2]['t_name']."<br>".$result[3]['t_name']."<br>".$result[4]['t_name']."
 					</div>";		
 			}
-		} else {
-			return "<div class=\"alert alert-dismissible alert-warning\">
-						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Внимание! </strong> Код не совпадает!
-					</div>";
-		}
 	}
 
 function task_select ($request) {
