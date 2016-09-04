@@ -1,51 +1,39 @@
 <?php
 
 	function create_task ($app, $request) {
-		$task_for = ($request->get('task_for') == 'undefined') ? NULL : $request->get('task_for');
+		$task_for = ($request->get('task_for') == 'undefined') ? 0 : $request->get('task_for');
 		$email_friend = ($request->get('email_friend') == 'undefined') ? NULL : $request->get('email_friend');
 		$task_name = ($request->get('task_name') == 'undefined') ? NULL : $request->get('task_name');
 		$task_description = ($request->get('task_description') == 'undefined') ? NULL : $request->get('task_description');
-		$task_date_finish = ($request->get('task_deadline') == 'undefined') ? NULL : $request->get('task_deadline');
+		$task_deadline_year = ($request->get('task_deadline_year') == 'undefined') ? 0 : $request->get('task_deadline_year');
+		$task_deadline_month = ($request->get('task_deadline_month') == 'undefined') ? 0 : $request->get('task_deadline_month');
+		$task_deadline_day = ($request->get('task_deadline_day') == 'undefined') ? 0 : $request->get('task_deadline_day');
+		$task_deadline_hour = ($request->get('task_deadline_hour') == 'undefined') ? 0 : $request->get('task_deadline_hour');
 		$task_date_create = date("Y-m-d H:i:s");
+		$task_date_finish = $task_deadline_year.'-'.$task_deadline_month.'-'.$task_deadline_day.' '.$task_deadline_hour.':00:00';
 
-		$email_rule = ($request->get('email_rule') == 'undefined') ? NULL : $request->get('email_rule');
-		$email_once = ($request->get('email_once') == 'undefined') ? NULL : $request->get('email_once');
-		$email_frequency = ($request->get('email_frequency') == 'undefined') ? NULL : $request->get('email_frequency');
-		$email_time = ($request->get('email_time') == 'undefined') ? NULL : $request->get('email_time');
-		$email_week = ($request->get('email_week') == 'undefined') ? NULL : $request->get('email_week');
-		$email_day = ($request->get('email_day') == 'undefined') ? NULL : $request->get('email_day');
-		$email_month = ($request->get('email_month') == 'undefined') ? NULL : $request->get('email_month');
-
-		$sms_rule = ($request->get('sms_rule') == 'undefined') ? NULL : $request->get('sms_rule');
-		$sms_once = ($request->get('sms_once') == 'undefined') ? NULL : $request->get('sms_once');
-		$sms_frequency = ($request->get('sms_frequency') == 'undefined') ? NULL : $request->get('sms_frequency');
-		$sms_time = ($request->get('sms_time') == 'undefined') ? NULL : $request->get('sms_time');
-		$sms_week = ($request->get('sms_week') == 'undefined') ? NULL : $request->get('sms_week');
-		$sms_day = ($request->get('sms_day') == 'undefined') ? NULL : $request->get('sms_day');
-		$sms_month = ($request->get('sms_month') == 'undefined') ? NULL : $request->get('sms_month');
-
-		$call_rule = ($request->get('call_rule') == 'undefined') ? NULL : $request->get('call_rule');
-		$call_style = ($request->get('call_style') == 'undefined') ? NULL : $request->get('call_style');
-		$call_once = ($request->get('call_once') == 'undefined') ? NULL : $request->get('call_once');
-		$call_frequency = ($request->get('call_frequency') == 'undefined') ? NULL : $request->get('call_frequency');
-		$call_time = ($request->get('call_time') == 'undefined') ? NULL : $request->get('call_time');
-		$call_week = ($request->get('call_week') == 'undefined') ? NULL : $request->get('call_week');
-		$call_day = ($request->get('call_day') == 'undefined') ? NULL : $request->get('call_day');
-		$call_month = ($request->get('call_month') == 'undefined') ? NULL : $request->get('call_month');
-		
-		
+		if(empty($task_name)){
+			return "<div class=\"alert alert-dismissible alert-warning\">
+						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+						<strong>Внимание! </strong> Укажите название для задачи.
+					</div>";
+			exit;
+		}
 
 		if (text_valid($task_name) !== TRUE) $error[] = text_valid($task_name);
 		if ($task_description == TRUE) {if (text_valid($task_description) !== TRUE) $error[] = text_valid($task_description);}
-		if ($email_friend == TRUE) {if (text_valid($email_friend) !== TRUE) $error[] = text_valid($email_friend);}
+		//if ($email_friend == TRUE) {if (text_valid($email_friend) !== TRUE) $error[] = text_valid($email_friend);}
 
 		if (count(@$error) > 0) {
 			return $error;
 			exit();
 		}
-		//return $task_for.'<br>'.$email_friend.'<br>'.$task_name.'<br>'.$task_description.'<br>'.$task_deadline.'<br>'.$email_rule.'<br>'.$email_once.'<br>'.$email_frequency.'<br>'.$email_time.'<br>'.$email_week.'<br>'.$email_day.'<br>'.$email_month.'<br>'.$sms_rule.'<br>'.$sms_once.'<br>'.$sms_frequency.'<br>'.$sms_time.'<br>'.$sms_week.'<br>'.$sms_day.'<br>'.$sms_month.'<br>'.$call_rule.'<br>'.$call_style.'<br>'.$call_once.'<br>'.$call_frequency.'<br>'.$call_time.'<br>'.$call_week.'<br>'.$call_day.'<br>'.$call_month;
+
+		//return $task_for.'<br>'.$email_friend.'<br>'.$task_name.'<br>'.$task_description.'<br>'.$task_date_finish;
+
 		global $dbh;
 		global $config;
+		global $mailer;
 
 		
 		if ($task_for == 1) {
@@ -63,12 +51,23 @@
 			$stm = $dbh->prepare($sql);
 			$write_a_task = $stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $_SESSION['user']['u_id'], ':ut_role_exec' => 2));
 
+			email_settings($request, $result_task, $dbh);
+			sms_settings($request, $result_task, $dbh);
+			call_settings($request, $result_task, $dbh);
+
 			return "<div class=\"alert alert-dismissible alert-success\">
 						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
 						<strong>Замечательно! </strong> Задача " . $task_name . " успешно создана!
 					</div>";
 		} elseif($task_for == 2) {
 			 //for another man
+			if(empty($email_friend)){
+				return "<div class=\"alert alert-dismissible alert-warning\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
+							<strong>Внимание! </strong> Укажите email получателя задачи.
+						</div>";
+				exit;
+			}
 			$sql = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2) and t_date_create > NOW() - INTERVAL 1 DAY";
 			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 			$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
@@ -79,20 +78,21 @@
 			if ($_SESSION['user']['u_tarif'] == 2) $max_count = $config['settings']['count_task_for_another_people']['tarif_sms'];
 			if ($_SESSION['user']['u_tarif'] == 3) $max_count = $config['settings']['count_task_for_another_people']['tarif_call'];
 
-			if ($count_result_today<=$max_count) {
+			if ($count_result_today<$max_count) {
 				$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_email = :email_friend";
 				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 				$sth->execute(array(':email_friend' => $email_friend));
 				$result_us = $sth->fetch(PDO::FETCH_ASSOC);
 				if ($result_us == TRUE) { //email есть
 					if ($result_us['u_status'] == 1) { //пользователь активирован (создание задачи и отправка сообщения о новой задачи)
+
 						$sql = "INSERT INTO tasks (t_name, t_description, t_date_create, t_date_finish) VALUES (:t_name, :t_description, :t_date_create, :t_date_finish)";
 						$stm = $dbh->prepare($sql);
-						$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $t_date_create, ':t_date_finish' => $t_date_finish));
+						$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $task_date_create, ':t_date_finish' => $task_date_finish));
 
 						$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 						$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-						$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $t_date_create));
+						$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $task_date_create));
 						$result_task = $sth->fetch(PDO::FETCH_ASSOC);
 
 						$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
@@ -107,29 +107,37 @@
 								->setBody($app['twig']->render('parts/emails/email_new_task.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $task_name, 'name' => $_SESSION['user']['u_name'].$_SESSION['user']['u_surname'])),'text/html');
 							$mailer->send($message);
 						}
+
+						email_settings($request, $result_task, $dbh);
+						sms_settings($request, $result_task, $dbh);
+						call_settings($request, $result_task, $dbh);
 							
 						return "<div class=\"alert alert-dismissible alert-success\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-							<strong>Поздравляем! </strong> Задача создана!<br>Название задачи:".$task_name."<br>Для пользователя:".$email_friend."!
+							<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$task_name."<br>Для пользователя: ".$email_friend."!
 						</div>";
 
 					} elseif ($result_us['u_status'] == 0) { //пользователь не активирован (создание заачи без отправки сообщения)
 						$sql = "INSERT INTO tasks (t_name, t_description, t_date_create, t_date_finish) VALUES (:t_name, :t_description, :t_date_create, :t_date_finish)";
 						$stm = $dbh->prepare($sql);
-						$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $t_date_create, ':t_date_finish' => $t_date_finish));
+						$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $task_date_create, ':t_date_finish' => $task_date_finish));
 
 						$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 						$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-						$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $t_date_create));
+						$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $task_date_create));
 						$result_task = $sth->fetch(PDO::FETCH_ASSOC);
 
 						$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
 						$stm = $dbh->prepare($sql);
 						$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
 
+						email_settings($request, $result_task, $dbh);
+						sms_settings($request, $result_task, $dbh);
+						call_settings($request, $result_task, $dbh);
+
 						return "<div class=\"alert alert-dismissible alert-success\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-							<strong>Поздравляем! </strong> Задача создана!<br>Название задачи:".$task_name."<br>Для пользователя:".$email_friend."!
+							<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$task_name."<br>Для пользователя: ".$email_friend."!
 						</div>";
 
 					}
@@ -145,11 +153,11 @@
 
 					$sql = "INSERT INTO tasks (t_name, t_description, t_date_create, t_date_finish) VALUES (:t_name, :t_description, :t_date_create, :t_date_finish)";
 					$stm = $dbh->prepare($sql);
-					$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $t_date_create, ':t_date_finish' => $t_date_finish));
+					$stm->execute(array(':t_name' => $task_name, ':t_description' => $task_description, ':t_date_create' => $task_date_create, ':t_date_finish' => $task_date_finish));
 
 					$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-					$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $t_date_create));
+					$sth->execute(array(':t_name' => $task_name, ':t_date_create' => $task_date_create));
 					$result_task = $sth->fetch(PDO::FETCH_ASSOC);
 
 					$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
@@ -163,21 +171,38 @@
 						->setBody($app['twig']->render('parts/emails/email_new_task_for_new_user.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $task_name, 'site' => $_SERVER['HTTP_HOST'])),'text/html');
 					$mailer->send($message);
 
+					email_settings($request, $result_task, $dbh);
+					sms_settings($request, $result_task, $dbh);
+					call_settings($request, $result_task, $dbh);
+
 					return "<div class=\"alert alert-dismissible alert-success\">
 						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Поздравляем! </strong> Задача создана!<br>Название задачи:".$task_name."<br>Для пользователя:".$email_friend."!
+						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$task_name."<br>Для пользователя: ".$email_friend."!
 					</div>";	
 				}
 			} else {
+				$p='P'.date("Y").'Y'.date("m").'M'.date("d").'DT'.date("H").'H'.date("i").'M'.date("s").'S';
 				$time_waiting = new DateTime($result[4]['t_date_create']);
-				$time_waiting->add(new DateInterval('P1D'));
-				$time_waiting->sub(new DateInterval($t_date_create));
+				$time_waiting->format('Y-m-d H:i:s');
+				$time_waiting->modify('+1 day');
+				$time_waiting->sub(new DateInterval($p));
+
 				return "<div class=\"alert alert-dismissible alert-warning\">
 						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Внимание! </strong> Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через ".$time_waiting->format('Y-m-d H:i:s')."<br>Последние задачи, которые Вы составили:<br>".$result[0]['t_name']."<br>".$result[1]['t_name']."<br>".$result[2]['t_name']."<br>".$result[3]['t_name']."<br>".$result[4]['t_name']."
-					</div>";		
+						<strong>Внимание! </strong> Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через ".$time_waiting->format('H:i:s')."<br>Последние задачи, которые Вы составили:<br>".$result[0]['t_name']."<br>".$result[1]['t_name']."<br>".$result[2]['t_name']."<br>".$result[3]['t_name']."<br>".$result[4]['t_name']."
+					</div>";	
 			}
 		}
+	}
+
+function email_settings($request, $result_task, $dbh) {
+		$email_rule = ($request->get('email_rule') == 'undefined') ? 0 : $request->get('email_rule');
+		$email_once = ($request->get('email_once') == 'undefined') ? 0 : $request->get('email_once');
+		$email_frequency = ($request->get('email_frequency') == 'undefined') ? 0 : $request->get('email_frequency');
+		$email_time = ($request->get('email_time') == 'undefined') ? 0 : $request->get('email_time');
+		$email_week = ($request->get('email_week') == 'undefined') ? 0 : $request->get('email_week');
+		$email_day = ($request->get('email_day') == 'undefined') ? 0 : $request->get('email_day');
+		$email_month = ($request->get('email_month') == 'undefined') ? 0 : $request->get('email_month');
 
 		if ($email_rule == 1) {
 			if ($_SESSION['user']['u_tarif'] > 0) {
@@ -186,6 +211,16 @@
 				$stm->execute(array(':t_id' => $result_task['t_id'], ':ter_turn' => $email_rule, ':ter_once' => $email_once, ':ter_frequency' => $email_frequency, ':ter_time' => $email_time, ':ter_day' => $email_day, ':ter_week' => $email_week, ':ter_month' => $email_month));
 			}
 		}
+	}
+
+	function sms_settings($request, $result_task, $dbh) {
+		$sms_rule = ($request->get('sms_rule') == 'undefined') ? 0 : $request->get('sms_rule');
+		$sms_once = ($request->get('sms_once') == 'undefined') ? 0 : $request->get('sms_once');
+		$sms_frequency = ($request->get('sms_frequency') == 'undefined') ? 0 : $request->get('sms_frequency');
+		$sms_time = ($request->get('sms_time') == 'undefined') ? 0 : $request->get('sms_time');
+		$sms_week = ($request->get('sms_week') == 'undefined') ? 0 : $request->get('sms_week');
+		$sms_day = ($request->get('sms_day') == 'undefined') ? 0 : $request->get('sms_day');
+		$sms_month = ($request->get('sms_month') == 'undefined') ? 0 : $request->get('sms_month');
 
 		if ($sms_rule == 1) {
 			if ($_SESSION['user']['u_tarif'] > 1) {
@@ -194,6 +229,17 @@
 				$stm->execute(array(':t_id' => $result_task['t_id'], ':tsr_turn' => $sms_rule, ':tsr_once' => $sms_once, ':tsr_frequency' => $sms_frequency, ':tsr_time' => $sms_time, ':tsr_day' => $sms_day, ':tsr_week' => $sms_week, ':tsr_month' => $sms_month));
 			}
 		}
+	}
+
+	function call_settings($request, $result_task, $dbh){
+		$call_rule = ($request->get('call_rule') == 'undefined') ? 0 : $request->get('call_rule');
+		$call_style = ($request->get('call_style') == 'undefined') ? 0 : $request->get('call_style');
+		$call_once = ($request->get('call_once') == 'undefined') ? 0 : $request->get('call_once');
+		$call_frequency = ($request->get('call_frequency') == 'undefined') ? 0 : $request->get('call_frequency');
+		$call_time = ($request->get('call_time') == 'undefined') ? 0 : $request->get('call_time');
+		$call_week = ($request->get('call_week') == 'undefined') ? 0 : $request->get('call_week');
+		$call_day = ($request->get('call_day') == 'undefined') ? 0 : $request->get('call_day');
+		$call_month = ($request->get('call_month') == 'undefined') ? 0 : $request->get('call_month');
 
 		if ($call_rule == 1) {
 			if ($_SESSION['user']['u_tarif'] > 2) {
@@ -203,8 +249,7 @@
 			}
 		}
 	}
-
-
+	
 function task_select ($request) {
 	global $config;
 	$lim = $config['settings']['count_task_on_one_page'];	//count of product on one page

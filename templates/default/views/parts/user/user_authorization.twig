@@ -19,7 +19,7 @@
 				<div class="col-xs-12 col-sm-12 col-md-4">
 					<div class="user-auth-add-task-to-friend-block">
 						<h3 align="center">Создать задачу</h3>
-						<form class="form-horizontal">
+						<form class="form-horizontal" id="form_new_task">
 							<div class="form-group">
 								<label for="task_for" class="col-sm-3 control-label">Задача для:</label>
 								<div class="col-sm-9">
@@ -43,7 +43,37 @@
 							<div class="form-group">
 								<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
 								<div class="col-sm-9">
-									<input type="datetime" name="task_deadline" class="form-control" id="task_deadline" required>
+									<center>
+										<select name="task_deadline" class="form-control" id="task_deadline_year">
+											{% for i in 2016..2025 %}
+												<option value="{{ i }}">{{ i }}</option>
+											{% endfor %}
+										</select>
+										<select name="task_deadline" class="form-control" id="task_deadline_month">
+											<option value="01">Январь</option>
+											<option value="02">Февраль</option>
+											<option value="03">Март</option>
+											<option value="04">Апрель</option>
+											<option value="05">Май</option>
+											<option value="06">Июнь</option>
+											<option value="07">Июль</option>
+											<option value="08">Август</option>
+											<option value="09">Сентябрь</option>
+											<option value="10">Октябрь</option>
+											<option value="11">Ноябрь</option>
+											<option value="12">Декабрь</option>
+										</select>
+										<select name="task_deadline" class="form-control" id="task_deadline_day">
+											{% for i in 1..31 %}
+												<option value="{{ i }}">{{ i }}</option>
+											{% endfor %}
+										</select>
+										<select name="task_deadline" class="form-control" id="task_deadline_hour">
+											{% for i in 0..23 %}
+												<option value="{{ i }}">{{ i }}:00</option>
+											{% endfor %}
+										</select>
+									</center>
 								</div>
 							</div>	
 							{%if session_user.u_tarif > 0 %}
@@ -62,8 +92,7 @@
 								<center><p><a disabled>Настройки звонков</a></p></center>
 							{%endif%}
 							<center><input type="button" onclick="create_task();" class="btn btn-success" value="Создать"></center>
-						</form>
-						<div id="answer_code_send"></div>
+						</form><br>
 						<div id="answer"></div>
 					</div>					
 				</div>
@@ -83,14 +112,16 @@
   					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
   				}
 			};
-
-		
+			
 			function create_task(){
 				var task_for = $('input:radio[name=task_for]:checked').val();
 				var email_friend = $('#email_friend').val();
 				var task_name = $('#task_name').val();
 				var task_description = $('#task_description').val();
-				var task_deadline = $('#task_deadline').val();
+				var task_deadline_year = $('#task_deadline_year').val();
+				var task_deadline_month = $('#task_deadline_month').val();
+				var task_deadline_day = $('#task_deadline_day').val();
+				var task_deadline_hour = $('#task_deadline_hour').val();
 				{%if session_user.u_tarif > 0 %}
 				var email_rule = $('input:radio[name=email_rule]:checked').val();
 				var email_once = $('#email_once').val();
@@ -119,13 +150,50 @@
 				var call_day = $('#call_day').val();
 				var call_month = $('#call_month').val();
 				{%endif%}
-				var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_description="+task_description+"&task_deadline="+task_deadline{%if session_user.u_tarif > 0 %}+"&email_rule="+email_rule+"&email_once="+email_once+"&email_frequency="+email_frequency+"&email_time="+email_time+"&email_week="+email_week+"&email_day="+email_day+"&email_month="+email_month{%endif%}{%if session_user.u_tarif > 1 %}+"&sms_rule="+sms_rule+"&sms_once="+sms_once+"&sms_frequency="+sms_frequency+"&sms_time="+sms_time+"&sms_week="+sms_week+"&sms_day="+sms_day+"&sms_month="+sms_month{%endif%}{%if session_user.u_tarif > 2 %}+"&call_rule="+call_rule+"&call_style="+call_style+"&call_once="+call_once+"&call_frequency="+call_frequency+"&call_time="+call_time+"&call_week="+call_week+"&call_day="+call_day+"&call_month="+call_month{%endif%};	
+				var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_description="+task_description+"&task_deadline_year="+task_deadline_year+"&task_deadline_month="+task_deadline_month+"&task_deadline_day="+task_deadline_day+"&task_deadline_hour="+task_deadline_hour{%if session_user.u_tarif > 0 %}+"&email_rule="+email_rule+"&email_once="+email_once+"&email_frequency="+email_frequency+"&email_time="+email_time+"&email_week="+email_week+"&email_day="+email_day+"&email_month="+email_month{%endif%}{%if session_user.u_tarif > 1 %}+"&sms_rule="+sms_rule+"&sms_once="+sms_once+"&sms_frequency="+sms_frequency+"&sms_time="+sms_time+"&sms_week="+sms_week+"&sms_day="+sms_day+"&sms_month="+sms_month{%endif%}{%if session_user.u_tarif > 2 %}+"&call_rule="+call_rule+"&call_style="+call_style+"&call_once="+call_once+"&call_frequency="+call_frequency+"&call_time="+call_time+"&call_week="+call_week+"&call_day="+call_day+"&call_month="+call_month{%endif%};	
 				$.ajax({
 					type: "POST",
 					url: "/task/create/universal",
 					data: query,
 					success: function(answer) {
 						$("#answer").html(answer);
+						document.getElementById('form_new_task').reset();
+						this.className = "tasks";
+				  		tasks.innerHTML = '';
+				  		this.className = "page";
+				  		page.innerHTML = '';
+				  		this.className = "email";
+				  		email.innerHTML = '';
+				  		var y = location.search;
+						$.getJSON("/task/select/special"+y,
+						function(data){
+							console.log(data);
+							var countall = data['count_all'];
+							var lim = data['lim'];
+							var task = data['task_type'];
+							var page = countall/lim;
+							var newpage = Math.ceil(page);
+							var z;
+							for (z=1; z<=newpage; z++) {
+								$('#page').append("<a onclick=\"sendData('?task="+task+"&page="+z+"');\" href=\"javascript://\"><button>"+z+"</button></a>");  
+							}
+							var i;  
+							for (i=0;i<=lim;i++) {
+								if ( [('number_' + i)] in data ) {
+									var status = data[('number_' + i)]['t_status'];
+									if (status == 1 && task!='from_others') {
+										var status_text = "<font class='task_status_color_active'>Активна</font>";
+										var check = "<div class='col-md-3'>Задача выполнена: <center><button onclick='change_status_task();' id='change_status' value='"+data[('number_' + i)]['t_id']+"'>✓</button></center></div>";
+									} else if (status == 1 && task=='from_others') {
+										var status_text = "<font class='task_status_color_active'>Активна</font>";
+										var check = "";
+									} else if (status == 0) {
+										var status_text = "<font class='task_status_color_no_active'>Выполнена</font>";
+										var check = "";
+									}
+								$('#tasks').append("<div id='lvlup_1_id"+i+"' class='user_tasks_blocks col-md-12'><div class='col-md-9'><p><font class='task_name_p'>Название: </font>"+data[('number_' + i)]['t_name']+"</p><p><font class='task_name_p'>Описание: </font>"+data[('number_' + i)]['t_description']+"</p><p><font class='task_name_p'>Дата создания: </font>"+data[('number_' + i)]['t_date_create']+"</p><p><font class='task_name_p'>Дата финала: </font>"+data[('number_' + i)]['t_date_finish']+"</p><p><font class='task_name_p'>Статус задачи: </font>"+status_text+"</p></div>"+check+"<div id='task_lvl_2_" + i + "'></div></div>"); 
+							}}}
+						)
 					}
 				});		
 			}
@@ -160,7 +228,8 @@
 						}
 					$('#tasks').append("<div id='lvlup_1_id"+i+"' class='user_tasks_blocks col-md-12'><div class='col-md-9'><p><font class='task_name_p'>Название: </font>"+data[('number_' + i)]['t_name']+"</p><p><font class='task_name_p'>Описание: </font>"+data[('number_' + i)]['t_description']+"</p><p><font class='task_name_p'>Дата создания: </font>"+data[('number_' + i)]['t_date_create']+"</p><p><font class='task_name_p'>Дата финала: </font>"+data[('number_' + i)]['t_date_finish']+"</p><p><font class='task_name_p'>Статус задачи: </font>"+status_text+"</p></div>"+check+"<div id='task_lvl_2_" + i + "'></div></div>"); 
 				}}}
-		)});
+			)});
+			
 			
 		function sendData (sData) {
 			location.search = sData;

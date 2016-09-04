@@ -148,7 +148,7 @@ function authorization ($request){
 
 	global $dbh;
 
-	$sql = "SELECT * FROM users  left join user_settings USING (u_id) WHERE u_email = :in_email";
+	$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_email = :in_email";
 	$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 	$sth->execute(array(':in_email' => $in_email));
 	$result = $sth->fetch(PDO::FETCH_ASSOC);
