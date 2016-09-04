@@ -19,6 +19,12 @@ $config['mail']['password'] = 'Nashlazyb';
 
 $config['settings']['count_task_on_one_page'] = 5;
 $config['settings']['template'] = 'default';
+$config['settings']['count_task_for_another_people']['tarif_free'] = 5;
+$config['settings']['count_task_for_another_people']['tarif_sms'] = 20;
+$config['settings']['count_task_for_another_people']['tarif_call'] = 10000;
+
+$config['user']['settings']['name'] = 'default';
+$config['user']['settings']['default']['us_turn_notification_about_new_task'] = 1;
 
 return $config;
 ?>

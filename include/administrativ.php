@@ -55,12 +55,25 @@ function registration ($request, $app){
 		} else {
 			$sql = "UPDATE `users` SET `u_name`=:u_name,`u_surname`=:u_surname,`u_city`=:u_city,`u_phone_number`=:u_phone_number,`u_password`=:u_password,`u_activation`=:u_activation,`u_date_registration`=:u_date_registration,`u_date_active`=:u_date_active WHERE 'u_email' = :u_email";
 			$stm = $dbh->prepare($sql);
-			$registration = $stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));
+			$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));
+
+			$sql = "INSERT INTO user_settings (u_id, us_turn_notification_about_new_task) VALUES (:u_id, :us_turn_notification_about_new_task)";
+			$stm = $dbh->prepare($sql);
+			$stm->execute(array(':u_id' => $result_email[0]['u_id'], ':us_turn_notification_about_new_task' => $config['user']['settings'][$config['user']['settings']['name']]['us_turn_notification_about_new_task']));
 		}
 	} else {
 		$sql = "INSERT INTO users (u_name, u_surname, u_city, u_phone_number, u_email, u_activation, u_password, u_date_registration, u_date_active) VALUES (:u_name, :u_surname, :u_city, :u_phone_number, :u_email, :u_activation, :u_password, :u_date_registration, :u_date_active)";
 		$stm = $dbh->prepare($sql);
-		$registration = $stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));	
+		$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));
+
+		$sql = "SELECT u_id FROM users WHERE u_email = :u_email AND u_date_registration = :u_date_registration";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_email' => $reg_email, ':u_date_registration' => $u_date_registration));
+		$result_user_id = $sth->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "INSERT INTO user_settings (u_id, us_turn_notification_about_new_task) VALUES (:u_id, :us_turn_notification_about_new_task)";
+		$stm = $dbh->prepare($sql);
+		$stm->execute(array(':u_id' => $result_user_id['u_id'], ':us_turn_notification_about_new_task' => $config['user']['settings'][$config['user']['settings']['name']]['us_turn_notification_about_new_task']));	
 	}
 
 	$message = \Swift_Message::newInstance()
@@ -135,7 +148,7 @@ function authorization ($request){
 
 	global $dbh;
 
-	$sql = "SELECT * FROM users WHERE u_email = :in_email";
+	$sql = "SELECT * FROM users  left join user_settings USING (u_id) WHERE u_email = :in_email";
 	$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 	$sth->execute(array(':in_email' => $in_email));
 	$result = $sth->fetch(PDO::FETCH_ASSOC);
@@ -222,7 +235,7 @@ function logout() {
 
 function turn_on_session() {
 	global $dbh;
-	$sql = "SELECT * FROM users WHERE u_auth_key = :u_auth_key";
+	$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_auth_key = :u_auth_key";
 	$sto = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 	$sto->execute(array(':u_auth_key' =>$_COOKIE['auth_key']));
 	$result = $sto->fetch(PDO::FETCH_ASSOC);
