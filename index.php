@@ -83,6 +83,10 @@ $app->match('/task/update/status', function(Request $request) use ($app) {
 	return update_task_status($request);
 });
 
+$app->match('/task/update/accept', function(Request $request) use ($app) {
+	return update_task_accept($request);
+});
+
 $app->match('/task/statistics/select', function(Request $request) use ($app) {
 	return statistics_tasks($request);
 });

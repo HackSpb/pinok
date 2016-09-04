@@ -11,8 +11,9 @@
 			<div class="row main_block_special">
 				<div class="col-xs-12 col-sm-12 col-md-8 block_of_task">
 					<div class="user_auth_main_block">
-						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи других пользователей</button> 
-					</div>
+						<button onclick="sendData('?task=own_all');">Мои задачи</button> <button onclick="sendData('?task=from_others');">Задачи для других пользователей</button> <button onclick="sendData('?task=new_from_others');">Новые задачи от других пользователей</button>
+					</div><br>
+					<div id="menu"></div>
 					<div id="tasks"></div>
 					<div id="page" align="center"></div>
 				</div>				
@@ -198,7 +199,7 @@
 				});		
 			}
 
-			$(document).ready(function render_task(){
+			$(document).ready(function(){
 			var y = location.search;
 			$.getJSON("/task/select/special"+y,
 			function(data){
@@ -212,21 +213,41 @@
 				for (z=1; z<=newpage; z++) {
 					$('#page').append("<a onclick=\"sendData('?task="+task+"&page="+z+"');\" href=\"javascript://\"><button>"+z+"</button></a>");  
 				}
-				var i;  
+				var i;
+
+				if (task == 'own_all' || task == 'own' || task == 'other') {
+					$('#menu').append("<button onclick=\"sendData('?task=own');\">Задачи, которые я сам себе создал</button> <button onclick=\"sendData('?task=other');\">Задачи, которые мне создали другие</button>");			
+				}  
+
 				for (i=0;i<=lim;i++) {
 					if ( [('number_' + i)] in data ) {
 						var status = data[('number_' + i)]['t_status'];
-						if (status == 1 && task!='from_others') {
+						var accept = data[('number_' + i)]['t_accept_with_task'];
+						if (status == 1 && (task!='from_others' && task!='new_from_others')) {
 							var status_text = "<font class='task_status_color_active'>Активна</font>";
-							var check = "<div class='col-md-3'>Задача выполнена: <center><button onclick='change_status_task();' id='change_status' value='"+data[('number_' + i)]['t_id']+"'>✓</button></center></div>";
-						} else if (status == 1 && task=='from_others') {
+							var check = "<div class='col-md-12'>Задача выполнена: <center><button onclick='change_status_task("+data[('number_' + i)]['t_id']+");' id='change_status'>✓</button></center></div>";
+						} else if ((status == 1 && (task == 'from_others' || task == 'new_from_others'))) {
 							var status_text = "<font class='task_status_color_active'>Активна</font>";
 							var check = "";
 						} else if (status == 0) {
 							var status_text = "<font class='task_status_color_no_active'>Выполнена</font>";
 							var check = "";
 						}
-					$('#tasks').append("<div id='lvlup_1_id"+i+"' class='user_tasks_blocks col-md-12'><div class='col-md-9'><p><font class='task_name_p'>Название: </font>"+data[('number_' + i)]['t_name']+"</p><p><font class='task_name_p'>Описание: </font>"+data[('number_' + i)]['t_description']+"</p><p><font class='task_name_p'>Дата создания: </font>"+data[('number_' + i)]['t_date_create']+"</p><p><font class='task_name_p'>Дата финала: </font>"+data[('number_' + i)]['t_date_finish']+"</p><p><font class='task_name_p'>Статус задачи: </font>"+status_text+"</p></div>"+check+"<div id='task_lvl_2_" + i + "'></div></div>"); 
+						if (accept == 0 && task == 'new_from_others') {
+							var accept_text = "<p><font class='task_name_p'><font class='task_status_color_active'>Новая задача</font></p>";
+							var accept_check = "<div class='col-md-12'>Принять задачу? <center><button onclick='change_accept_task("+data[('number_' + i)]['t_id']+");' id='change_accept' >✓</button></center></div>";
+						} else if (accept == 1 && task == 'from_others') {
+							var accept_text = "<p><font class='task_name_p'><font class='task_status_color_no_active'>Задача принята</font></p>";
+							var accept_check = "";
+						} else if (accept == 0 && task == 'from_others') {
+							var accept_text = "<p><font class='task_name_p'><font class='task_status_color_active'>Задача не принята</font></p>";
+							var accept_check = "";
+						}else if (task == 'own_all' || task == 'own' || task == 'other') {
+							var accept_text = "";
+							var accept_check = "";
+						}
+						
+					$('#tasks').append("<div id='lvlup_1_id"+i+"' class='user_tasks_blocks col-md-12'><div class='col-md-8'><p><font class='task_name_p'>Название: </font>"+data[('number_' + i)]['t_name']+"</p><p><font class='task_name_p'>Описание: </font>"+data[('number_' + i)]['t_description']+"</p><p><font class='task_name_p'>Дата создания: </font>"+data[('number_' + i)]['t_date_create']+"</p><p><font class='task_name_p'>Дата финала: </font>"+data[('number_' + i)]['t_date_finish']+"</p><p><font class='task_name_p'>Статус задачи: </font>"+status_text+"</p>"+accept_text+"</div><div class='col-md-4'>"+check+accept_check+"</div><div id='task_lvl_2_" + i + "'></div></div>"); 
 				}}}
 			)});
 			
@@ -234,9 +255,18 @@
 		function sendData (sData) {
 			location.search = sData;
 		} 
+
+		function change_category(){
+			var change_own = $('#change_own').val();
+			var change_other = $('#change_other').val();
+			if (change_own == 'own'){
+				sendData('?task=own');
+			} else if (change_other == 'other') {
+				sendData('?task=other');
+			}
+		}
 		
-		function change_status_task(){
-			var	number = $('#change_status').val();
+		function change_status_task(number){
 			var query ="number="+number;
 			$.ajax({
 				type: "POST",
@@ -249,6 +279,21 @@
 				}			
 			});
 		}	
+
+		function change_accept_task(number){
+			var query ="number="+number;
+			$.ajax({
+				type: "POST",
+				url: "/task/update/accept",
+				data: query,
+				success: function(answer) {
+						if (answer==1){
+							location.reload();
+						}
+				}			
+			});
+		}
+
 		</script>
 	</body>
 </html>
