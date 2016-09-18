@@ -1,19 +1,11 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		{% include 'parts/overall/head.twig' %}
-	</head>
-	<header>
-		{% include 'parts/overall/header.twig' %}
-	</header> 
-	<body>
-		<div class="container home-box-body">
+{% extends "layout.twig" %}
+{% block content %}
+	
 			<div class="row">
 				<div class="col-md-12 activation">
 				{{activation}}
 				</div>
 			</div>
 			{% include 'parts/overall/footer.twig' %}
-		</div>
-	</body>
-</html>
+		
+{% endblock %}

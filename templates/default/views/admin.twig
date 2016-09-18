@@ -1,3 +1,6 @@
+{% extends "layout.twig" %}
+{% block content %}
+
 {% if session_user == true%}
 	{%if session_user.u_role == 1 %}
 		{% include 'parts/admin/default.twig'%}
@@ -12,5 +15,11 @@
 		{% include 'parts/admin/administrator.twig'%}
 	{%endif%}
 {%else%}
-	{% include 'parts/admin/default.twig'%}
+	<div class="row main_block_special">
+		<center><h2>Произошла ошибка 404. Вернитесь на главную страницу!</h2></center>
+	</div>		
+
+	{% include 'parts/overall/footer.twig' %}
 {%endif%}
+
+{% endblock %}

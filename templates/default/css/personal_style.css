@@ -1,10 +1,10 @@
 
 body {
- background-color: #e5d6cd ;
+ background-color: #CDD6E5 ;
 }
 
 .home-box-body {
- margin-top: 70px;
+ margin-top: 60px;
 }
 
 .authorization {
@@ -301,4 +301,8 @@ color:red;
 
 .task_status_color_no_active{
 color:green;
+}
+
+.block_personal_task{
+  padding-bottom:15px;
 }

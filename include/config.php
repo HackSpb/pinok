@@ -6,10 +6,13 @@
 */
 
 /* tasks and role:
-// 5 - main task, personal task for user, once
-// 10 - project
-// 15 - task
-// 20 - point of task
+// 2 - main task, personal task for user, once
+// 4 - project
+// (6 - task)
+// 61 - event
+// 62 - development
+// 63 - business
+// 8 - point of task
 */
 
 

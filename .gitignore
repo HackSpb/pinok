@@ -5,3 +5,6 @@ db/
 
 #ignore personal config file
 include/local.config.php
+
+#ignore temporary files
+tmp/

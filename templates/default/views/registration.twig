@@ -1,13 +1,5 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		{% include 'parts/overall/head.twig' %}
-	</head>
-	<header>
-		{% include 'parts/overall/header.twig' %}
-	</header> 
-	<body>
-		<div class="container registration-box-body">
+{% extends "layout.twig" %}
+{% block content %}
 			<div class="row">
 				<div class="col-md-12">
 					{% include 'parts/registration/registration_code.twig' %}
@@ -16,7 +8,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
+
 		{% include 'parts/registration/registration_footer.twig' %}
-	</body>
-</html>
+{% endblock %}	
