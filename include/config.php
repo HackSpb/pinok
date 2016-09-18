@@ -1,9 +1,17 @@
 <?php
 
-//system roles:
-//1 - author
-//2 - executor
-//
+/* system roles:
+// 1 - author
+// 2 - executor
+*/
+
+/* tasks and role:
+// 5 - main task, personal task for user, once
+// 10 - project
+// 15 - task
+// 20 - point of task
+*/
+
 
 $config['bd']['host'] = 'localhost';
 $config['bd']['dbname'] = 'PINOK';
