@@ -60,6 +60,7 @@ $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 
 $app->before(function ($request) use ($app) {
     $app['twig']->addGlobal('active', $request->get("_route"));
+    $app['twig']->addGlobal('session_user', @$_SESSION['user']);
 });
 
 //for script
@@ -99,44 +100,44 @@ $app->match('/', function(Request $request) use ($app) {
 	$in_password = $request->get('in_password');
 	if (isset($in_email) or isset($in_password)) $code = authorization($request);
 	if (isset($registration)) $code = $registration;
-	return $app['twig']->render('home.twig', array('code' => @$code, 'session_user' => @$_SESSION['user']));
+	return $app['twig']->render('home.twig', array('code' => @$code));
 })->bind('home');
 
 $app->match('/registration', function(Request $request) use ($app) {
 	$reg_name = $request->get('reg_name');
 	$reg_password = $request->get('reg_password');
 	if (isset($reg_name) or isset($reg_password)) $code = registration($request, $app);
-	return $app['twig']->render('registration.twig', array('code' => @$code, 'session_user' => @$_SESSION['user']));
+	return $app['twig']->render('registration.twig', array('code' => @$code));
 })->bind('registration');
 
 $app->match('/community', function() use ($app) {
-	return $app['twig']->render('community.twig', array('session_user' => @$_SESSION['user']));
+	return $app['twig']->render('community.twig');
 });
 
 $app->match('/news', function() use ($app) {
-	return $app['twig']->render('news.twig', array('session_user' => @$_SESSION['user']));
+	return $app['twig']->render('news.twig');
 });
 
 $app->match('/application', function() use ($app) {
-	return $app['twig']->render('application.twig', array('session_user' => @$_SESSION['user']));
+	return $app['twig']->render('application.twig');
 });
 
 $app->match('/activation/{activation}', function($activation) use ($app) {
 	$activation_user = activation($activation);
-	return $app['twig']->render('activation.twig', array('activation' => $activation_user, 'session_user' => @$_SESSION['user']));
+	return $app['twig']->render('activation.twig', array('activation' => $activation_user));
 });
 
 $app->match('/admin', function() use ($app) {
-	return $app['twig']->render('admin.twig', array('session_user' => @$_SESSION['user']));
+	return $app['twig']->render('admin.twig');
 });
 
 $app->match('/id{u_id}', function(Request $request, $u_id) use ($app) {
 	$role = analyzer($u_id);
 	if ($role == 404) {
-		return $app['twig']->render('error.twig', array('code' => $role, 'session_user' => @$_SESSION['user']));
+		return $app['twig']->render('error.twig', array('code' => $role));
 		exit();
 	}
-	return $app['twig']->render('user.twig', array('template' => $role['template'], 'user' => $role, 'session_user' => @$_SESSION['user']));
+	return $app['twig']->render('user.twig', array('template' => $role['template'], 'user' => $role));
 });
 
 $app->run();
