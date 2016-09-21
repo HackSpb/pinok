@@ -37,18 +37,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Silex\Provider\SwiftmailerServiceProvider;
 
-
-$app->error(
-        function (Exception $e) use ($app) {
-            if ($e instanceof NotFoundHttpException) {
-                return $app['twig']->render('error.twig', array('code' => 404, 'session' => @$_SESSION['user']));
-            }
-            $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
-            return $app['twig']->render('error.twig', array('code' => $code, 'session' => @$_SESSION['user']));
-        }
-);
-
-
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 
 $transport = Swift_SmtpTransport::newInstance($config['mail']['host'], $config['mail']['port'], $config['mail']['encryption'])
@@ -62,6 +50,18 @@ $app->before(function ($request) use ($app) {
     $app['twig']->addGlobal('active', $request->get("_route"));
     $app['twig']->addGlobal('session_user', @$_SESSION['user']);
 });
+
+
+$app->error(
+        function (Exception $e) use ($app) {
+            if ($e instanceof NotFoundHttpException) {
+                return $app['twig']->render('error.twig', array('code' => 404));
+            }
+            $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
+            return $app['twig']->render('error.twig', array('code' => $code));
+        }
+);
+
 
 //for script
 $app->match('/logout', function() use ($app) {
