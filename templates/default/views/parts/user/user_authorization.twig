@@ -5,10 +5,13 @@
 			</div>
 			<div class="row main_block_special">
 					<div class="col-md-2" style="background:#A4ABB7; height:700px">
-						<a href="#"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
-						<a href="#"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
-						<a href="#"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
-						<a href="#"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Заметки</div></a>
+						<a onclick=""><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
+						<a onclick="$('#project').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
+						<div id="project" style="display: none;">2</div>
+						<a onclick="$('#tasks').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
+						<div id="tasks" style="display: none;">3</div>
+						<a onclick="$('#notes').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Заметки</div></a>
+						<div id="notes" style="display: none;">4</div>
 					</div>
 					<div class="col-md-7">
 						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Покормить котенка</h3><p>Покорми котенка, сучка</p></div></div>
@@ -25,26 +28,107 @@
 						</div>
 						<div class="col-md-12">
 							<ul class="nav nav-tabs">
-							  <li class=""><a href="#user" data-toggle="tab" aria-expanded="false"><div class="icon-user"></div></a></li>
-							  <li class=""><a href="#calendar" data-toggle="tab" aria-expanded="false"><div class="icon-calendar"></div></a></li>
-							  <li class=""><a href="#importance" data-toggle="tab" aria-expanded="false"><div class="icon-notification"></div></a></li>
-							  <li class=""><a href="#tags" data-toggle="tab" aria-expanded="false"><div class="icon-price-tag"></div></a></li>
+							    <li><a href="#user" data-toggle="tab" aria-expanded="false"><div class="icon-user"></div></a></li>
+							    <li><a href="#calendar" data-toggle="tab" aria-expanded="false"><div class="icon-calendar"></div></a></li>
+							    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div class="icon-notification"></div></a></li>
+							    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div class="icon-price-tag"></div></a></li>
 							</ul>
-							<div id="myTabContent" class="tab-content">
-							  <div class="tab-pane fade in" id="user">
-							    <p>для кого</p>
-							  </div>
-							  <div class="tab-pane fade" id="calendar">
-							    <p>тип и напоминания</p>
-							  </div>
-							  <div class="tab-pane fade" id="importance">
-							    <p>важность - звездочки</p>
-							  </div>
-							  <div class="tab-pane fade" id="tags">
-							    <p>теги</p>
-							  </div>
-							</div>
+							<form>
+								<div id="myTabContent" class="tab-content">
+								    <div class="tab-pane fade in" id="user">
+								    	<div class="form-group">
+											<label for="task_for" class="col-sm-3 control-label">Задача для:</label>
+											<div class="col-sm-9">
+												<input type="radio" name="task_for" id="task_for_1" checked value="1"> Для себя<Br>
+	   											<input type="radio" name="task_for" id="task_for_2" value="2"> Для другого<Br>
+											</div>
+										</div>
+										<div id="email"></div>
+								  	</div>
+								  	<div class="tab-pane fade" id="calendar">
+								    	<div class="form-group">
+											<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
+											<div class="col-sm-9">
+												<center>
+													<select name="task_deadline" class="form-control" id="task_deadline_year">
+														{% for i in 2016..2025 %}
+															<option value="{{ i }}">{{ i }}</option>
+														{% endfor %}
+													</select>
+													<select name="task_deadline" class="form-control" id="task_deadline_month">
+														<option value="01">Январь</option>
+														<option value="02">Февраль</option>
+														<option value="03">Март</option>
+														<option value="04">Апрель</option>
+														<option value="05">Май</option>
+														<option value="06">Июнь</option>
+														<option value="07">Июль</option>
+														<option value="08">Август</option>
+														<option value="09">Сентябрь</option>
+														<option value="10">Октябрь</option>
+														<option value="11">Ноябрь</option>
+														<option value="12">Декабрь</option>
+													</select>
+													<select name="task_deadline" class="form-control" id="task_deadline_day">
+														{% for i in 1..31 %}
+															<option value="{{ i }}">{{ i }}</option>
+														{% endfor %}
+													</select>
+													<select name="task_deadline" class="form-control" id="task_deadline_hour">
+														{% for i in 0..23 %}
+															<option value="{{ i }}">{{ i }}:00</option>
+														{% endfor %}
+													</select>
+												</center>
+											</div>
+										</div>	
+								  	</div>
+								  	<div class="tab-pane fade" id="importance">
+								    	<p>важность - звездочки</p>
+								  	</div>
+								  	<div class="tab-pane fade" id="tags">
+								  		<center><p>
+								  			<select>
+								  				<option>Проект</option>
+								  				<option>Событие</option>
+								  				<option>Мероприятие</option>
+								  				<option>Заметка</option>
+								  			</select>
+								  		</p></center>
+								    	{%if session_user.u_tarif > 0 %}
+											{%include 'parts/user/user_authorization/email_settings.twig'%}
+										{%else%}
+											<center><p><a disabled>Настройки Email</a></p></center>
+										{%endif%}
+										{%if session_user.u_tarif > 1 %}
+											{%include 'parts/user/user_authorization/sms_settings.twig'%}
+										{%else%}
+											<center><p><a disabled>Настройки SMS</a></p></center>
+										{%endif%}
+										{%if session_user.u_tarif > 2 %}
+											{%include 'parts/user/user_authorization/call_settings.twig'%}
+										{%else%}
+											<center><p><a disabled>Настройки звонков</a></p></center>
+										{%endif%}
+								  	</div>
+								</div>
+							</form>
 						</div>
 					</div>
 			</div>
+
+			<script>
+			task_for_1.onfocus = function() {
+  				if (this.value == 1) { 
+  					this.className = "email";
+  					email.innerHTML = '';
+  				}
+			};		
+			task_for_2.onfocus = function() {
+  				if (this.value == 2) { 
+  					this.className = "email";
+  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
+  				}
+			};
+			</script>
 		
