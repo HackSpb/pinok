@@ -11,10 +11,15 @@
 // (6 - task)
 // 61 - event
 // 62 - development
-// 63 - business
-// 8 - point of task
+// 63 - notes
 */
 
+/* roles in groups:
+// 2 - creater
+// 4 - administrator
+// 6 - looking
+// 8 - worker
+*/
 
 $config['bd']['host'] = 'localhost';
 $config['bd']['dbname'] = 'PINOK';

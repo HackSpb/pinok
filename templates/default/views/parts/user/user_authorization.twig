@@ -7,24 +7,25 @@
 					<div class="col-md-2" style="background:#A4ABB7; height:700px">
 						<a onclick=""><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
 						<a onclick="$('#project').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
-						<div id="project" style="display: none;">2</div>
-						<a onclick="$('#tasks').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
-						<div id="tasks" style="display: none;">3</div>
+						<div id="project" style=""></div>
+						<a onclick="$('#task').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
+						<div id="task" style=""></div>
 						<a onclick="$('#notes').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Заметки</div></a>
-						<div id="notes" style="display: none;">4</div>
+						<div id="notes" style=""></div>
 					</div>
 					<div class="col-md-7">
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Покормить котенка</h3><p>Покорми котенка, сучка</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Сходить в магазин</h3><p>Сходи в магазин, сучка</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Постирать грязное бельишко</h3><p>Постирай белье, сучка</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Купить подарок на новый год</h3><p>Купи подарок, сучка</p></div></div>
+						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Покормить котенка</h3><p>Покорми котенка</p></div></div>
+						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Сходить в магазин</h3><p>Сходи в магазин</p></div></div>
+						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Постирать грязное бельишко</h3><p>Постирай белье</p></div></div>
+						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Купить подарок на новый год</h3><p>Купи подарок</p></div></div>
 					</div>
 					<div class="col-md-3" style="background:#A4ABB7">
-						<div class="col-md-9">
-							<input>
+						<form>
+						<div class="col-md-8">
+							<input type="text" id="task_name" required>
 						</div>
-						<div class="col-md-3">
-							<button>Го!</button>
+						<div class=" col-md-offset-1 col-md-3">
+							<input type="button" onclick="create_task();" class="btn" value="го">
 						</div>
 						<div class="col-md-12">
 							<ul class="nav nav-tabs">
@@ -33,7 +34,7 @@
 							    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div class="icon-notification"></div></a></li>
 							    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div class="icon-price-tag"></div></a></li>
 							</ul>
-							<form>
+							
 								<div id="myTabContent" class="tab-content">
 								    <div class="tab-pane fade in" id="user">
 								    	<div class="form-group">
@@ -46,89 +47,122 @@
 										<div id="email"></div>
 								  	</div>
 								  	<div class="tab-pane fade" id="calendar">
-								    	<div class="form-group">
+								  		<div class="form-group">
 											<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
 											<div class="col-sm-9">
-												<center>
-													<select name="task_deadline" class="form-control" id="task_deadline_year">
-														{% for i in 2016..2025 %}
-															<option value="{{ i }}">{{ i }}</option>
-														{% endfor %}
-													</select>
-													<select name="task_deadline" class="form-control" id="task_deadline_month">
-														<option value="01">Январь</option>
-														<option value="02">Февраль</option>
-														<option value="03">Март</option>
-														<option value="04">Апрель</option>
-														<option value="05">Май</option>
-														<option value="06">Июнь</option>
-														<option value="07">Июль</option>
-														<option value="08">Август</option>
-														<option value="09">Сентябрь</option>
-														<option value="10">Октябрь</option>
-														<option value="11">Ноябрь</option>
-														<option value="12">Декабрь</option>
-													</select>
-													<select name="task_deadline" class="form-control" id="task_deadline_day">
-														{% for i in 1..31 %}
-															<option value="{{ i }}">{{ i }}</option>
-														{% endfor %}
-													</select>
-													<select name="task_deadline" class="form-control" id="task_deadline_hour">
-														{% for i in 0..23 %}
-															<option value="{{ i }}">{{ i }}:00</option>
-														{% endfor %}
-													</select>
-												</center>
+												<input type="radio" name="deadline_turn" id="deadline_on" value="1">Да
+   												<input type="radio" name="deadline_turn" id="deadline_off" checked value="0">Нет<Br>
 											</div>
-										</div>	
+											<div class="col-sm-9" id="deadline"></div>
+										</div>
 								  	</div>
 								  	<div class="tab-pane fade" id="importance">
 								    	<p>важность - звездочки</p>
 								  	</div>
 								  	<div class="tab-pane fade" id="tags">
 								  		<center><p>
-								  			<select>
-								  				<option>Проект</option>
-								  				<option>Событие</option>
-								  				<option>Мероприятие</option>
-								  				<option>Заметка</option>
+								  			<select id="task_type">
+								  				<option value="4">Проект</option>
+								  				<option value="62">Событие</option>
+								  				<option value="61">Мероприятие</option>
+								  				<option value="63" selected>Заметка</option>
 								  			</select>
 								  		</p></center>
-								    	{%if session_user.u_tarif > 0 %}
-											{%include 'parts/user/user_authorization/email_settings.twig'%}
-										{%else%}
-											<center><p><a disabled>Настройки Email</a></p></center>
-										{%endif%}
-										{%if session_user.u_tarif > 1 %}
-											{%include 'parts/user/user_authorization/sms_settings.twig'%}
-										{%else%}
-											<center><p><a disabled>Настройки SMS</a></p></center>
-										{%endif%}
-										{%if session_user.u_tarif > 2 %}
-											{%include 'parts/user/user_authorization/call_settings.twig'%}
-										{%else%}
-											<center><p><a disabled>Настройки звонков</a></p></center>
-										{%endif%}
 								  	</div>
 								</div>
 							</form>
 						</div>
+						<div id="answer"></div>
 					</div>
 			</div>
-
+			<div class="temp_task" id="temp_task" style="display:none">			
+				<div class="1"></div>
+			</div>
 			<script>
-			task_for_1.onfocus = function() {
-  				if (this.value == 1) { 
-  					this.className = "email";
-  					email.innerHTML = '';
-  				}
-			};		
-			task_for_2.onfocus = function() {
-  				if (this.value == 2) { 
-  					this.className = "email";
-  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
-  				}
-			};
+				task_for_1.onfocus = function() {
+	  				if (this.value == 1) { 
+	  					this.className = "email";
+	  					email.innerHTML = '';
+	  				}
+				};		
+				task_for_2.onfocus = function() {
+	  				if (this.value == 2) { 
+	  					this.className = "email";
+	  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
+	  				}
+				};
+
+				deadline_on.onfocus = function() {
+					  if (this.value == 1) { 
+					  	this.className = "deadline";
+					  	deadline.innerHTML = '<center><select name="task_deadline" class="form-control" id="task_deadline_year">{% for i in 2016..2025 %}<option value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_month"><option value="01">Январь</option><option value="02">Февраль</option><option value="03">Март</option><option value="04">Апрель</option><option value="05">Май</option><option value="06">Июнь</option><option value="07">Июль</option><option value="08">Август</option><option value="09">Сентябрь</option><option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select><select name="task_deadline" class="form-control" id="task_deadline_day">{% for i in 1..31 %}<option value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_hour">{% for i in 0..23 %}<option value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></center>';
+					  }
+				};		
+
+				deadline_off.onfocus = function() {
+					  if (this.value == 0) { 
+					  	this.className = "deadline";
+					  	deadline.innerHTML = '';
+					  }
+				};
+
+				function create_task(){
+					var task_for = $('input:radio[name=task_for]:checked').val();
+					var email_friend = $('#email_friend').val();
+					var task_name = $('#task_name').val();
+					var task_deadline_turn = $('input:radio[name=deadline_turn]:checked').val();		
+					var task_deadline_year = $('#task_deadline_year').val();
+					var task_deadline_month = $('#task_deadline_month').val();
+					var task_deadline_day = $('#task_deadline_day').val();
+					var task_deadline_hour = $('#task_deadline_hour').val();
+					var task_type = $('#task_type').val();
+
+					//alert(task_for+email_friend+task_name+task_deadline_turn+task_deadline_year+task_deadline_month+task_deadline_day+task_deadline_hour+task_type);
+
+					var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_deadline_turn="+task_deadline_turn+"&task_deadline_year="+task_deadline_year+"&task_deadline_month="+task_deadline_month+"&task_deadline_day="+task_deadline_day+"&task_deadline_hour="+task_deadline_hour+"&task_type="+task_type;	
+					$.ajax({
+						type: "POST",
+						url: "/task/do/create",
+						data: query,
+						success: function(answer) {
+							//$("#answer").html(answer);	
+							location.reload();				
+						}
+					});		
+				}
+
+				$(document).ready(function(){
+				    $.getJSON("/task/select/list",
+				        function(data){
+				        console.log(data);
+				        var i; 
+				        var s = $('#temp_task').html();// берем образцовый хтмл из скрытого шаблона 
+				        if (data.projects != 1) {
+							for (i=0;i<10;i++){
+					
+								$('#project').append("<div id='id_p_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+					
+								$('#id_p_'+i).render(data.projects['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+							}	
+						}
+						if (data.tasks != 1) {
+							for (i=0;i<10;i++){
+					
+								$('#task').append("<div id='id_t_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+					
+								$('#id_t_'+i).render(data.tasks['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+							}
+						}
+						if (data.notes != 1) {
+							for (i=0;i<10;i++){
+					
+								$('#notes').append("<div id='id_n_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+					
+								$('#id_n_'+i).render(data.notes['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+							}	
+						}
+				    });
+				});
+
 			</script>
 		

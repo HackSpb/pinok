@@ -72,12 +72,12 @@ $app->match('/logout', function() use ($app) {
 	exit;
 });
 
-$app->match('/task/select/special', function(Request $request) use ($app) {
-	return task_select($request);
+$app->match('/task/do/create', function(Request $request) use ($app) {
+	return create_task($app, $request);
 });
 
-$app->match('/task/create/universal', function(Request $request) use ($app) {
-	return create_task($app, $request);
+$app->match('/task/select/list', function(Request $request) use ($app) {
+	return task_select_list($request);
 });
 
 $app->match('/task/update/status', function(Request $request) use ($app) {
