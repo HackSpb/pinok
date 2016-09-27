@@ -278,64 +278,6 @@
 		}
 	}
 	
-	function task_select ($request) {
-		global $config;
-		$lim = $config['settings']['count_task_on_one_page'];	//count of product on one page
-		$page = $request->get('page');
-		$task_type = $request->get('task');
-		if (!isset($task_type)) $task_type='own_all';
-		if ($task_type == 'own_all') {
-			$sql_all = "select * from tasks left join users_tasks USING (t_id) where t_accept_with_task=1 and ut_role=2 and u_id=:u_id";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and t_accept_with_task=1 and u_id=? and u_id=? ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";			
-		} elseif ($task_type == 'own') {
-			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=1 and t_id in (select t_id from users_tasks where u_id=:u_id and ut_role=1)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=1 and t_id in (select t_id from users_tasks where u_id=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
-		} elseif ($task_type == 'other') {
-			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=1 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=1 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
-		} elseif ($task_type == 'from_others') {
-			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=2) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
-		} elseif ($task_type == 'new_from_others') {
-			$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
-			$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
-		} else {
-			$result['number_0']['t_name'] = 'Ошибка!';
-			return json_encode ($result);
-			exit();
-		}
-		global $dbh;
-		$sth = $dbh->prepare($sql_all, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
-		$result = $sth->fetchAll();
-		$count_result = count($result);
-			
-		if (isset($page) && $page > 0) {
-			$number_page = $page;
-		} else {
-			$number_page = 1;
-		}
-		$start = ($number_page - 1) * $lim;
-			
-		$stm = $dbh->prepare($sql_special);		
-		$stm->bindValue(1, $_SESSION['user']['u_id'], PDO::PARAM_INT);	
-		$stm->bindValue(2, $_SESSION['user']['u_id'], PDO::PARAM_INT);		
-		$stm->bindValue(3, $start, PDO::PARAM_INT);
-		$stm->bindValue(4, $lim, PDO::PARAM_INT);
-		$stm->execute();
-		$result_special = $stm->fetchAll();
-		$count_result_special = count($result_special);
-			
-		for ($stroka_v_massive = 0; $stroka_v_massive < $count_result_special; $stroka_v_massive++) {
-			$result_new['number_' . $stroka_v_massive] = $result_special[$stroka_v_massive];
-		}
-
-		$result_new['count_all'] = $count_result;
-		$result_new['lim'] = $lim;
-		$result_new['task_type'] = $task_type;
-		return json_encode ($result_new);		
-	}
-
 	function task_select_list($request) {
 		global $dbh;
 

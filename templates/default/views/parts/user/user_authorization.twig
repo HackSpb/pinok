@@ -5,7 +5,7 @@
 			</div>
 			<div class="row main_block_special">
 					<div class="col-md-2" style="background:#A4ABB7; height:700px">
-						<a onclick=""><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
+						<a href="?task_n=main"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
 						<a onclick="$('#project').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
 						<div id="project" style=""></div>
 						<a onclick="$('#task').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
@@ -14,10 +14,7 @@
 						<div id="notes" style=""></div>
 					</div>
 					<div class="col-md-7">
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Покормить котенка</h3><p>Покорми котенка</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Сходить в магазин</h3><p>Сходи в магазин</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Постирать грязное бельишко</h3><p>Постирай белье</p></div></div>
-						<div class="col-md-4"><div class="home-info-block" style="height:220px; margin-top: 20px;"><h3>Купить подарок на новый год</h3><p>Купи подарок</p></div></div>
+						<div class="content"></div>
 					</div>
 					<div class="col-md-3" style="background:#A4ABB7">
 						<form>
@@ -25,7 +22,7 @@
 							<input type="text" id="task_name" required>
 						</div>
 						<div class=" col-md-offset-1 col-md-3">
-							<input type="button" onclick="create_task();" class="btn" value="го">
+							<input type="submit" onclick="create_task();" class="btn" value="го">
 						</div>
 						<div class="col-md-12">
 							<ul class="nav nav-tabs">
@@ -76,7 +73,19 @@
 					</div>
 			</div>
 			<div class="temp_task" id="temp_task" style="display:none">			
-				<div class="1"></div>
+				<a class="link"><div class="1"></div></a>
+			</div>
+			<div class="col-md-4" style="display:none">
+				<div class="home-info-block" style="height:220px; margin-top: 20px;">
+					<h3>Покормить котенка</h3>
+					<p>Покорми котенка</p>
+				</div>
+			</div>
+			<div class="col-md-12" style="display:none">
+				<div class="home-info-block" style="height:220px; margin-top: 20px;">
+					<h3 class="t_name"></h3>
+					<p></p>
+				</div>
 			</div>
 			<script>
 				task_for_1.onfocus = function() {
@@ -125,44 +134,70 @@
 						url: "/task/do/create",
 						data: query,
 						success: function(answer) {
-							//$("#answer").html(answer);	
-							location.reload();				
+							$("#answer").html(answer);
+							download_list();
 						}
-					});		
+					});	
+					return false;	
 				}
 
 				$(document).ready(function(){
-				    $.getJSON("/task/select/list",
+				    download_list();
+				});
+
+				function download_list(){
+					$.getJSON("/task/select/list",
 				        function(data){
 				        console.log(data);
 				        var i; 
+				       
 				        var s = $('#temp_task').html();// берем образцовый хтмл из скрытого шаблона 
 				        if (data.projects != 1) {
-							for (i=0;i<10;i++){
-					
+							for (i=0;i<20;i++){
+								directives = {
+									link: {
+									    href: function(params) {
+									    	return "?task_n=" + data.projects['number_'+i].t_id;
+										}
+									}
+								};
 								$('#project').append("<div id='id_p_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
 					
-								$('#id_p_'+i).render(data.projects['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+								$('#id_p_'+i).render(data.projects['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
 							}	
 						}
 						if (data.tasks != 1) {
-							for (i=0;i<10;i++){
-					
+							for (i=0;i<20;i++){
+								directives = {
+									link: {
+									    href: function(params) {
+									    	return "?task_n=" + data.tasks['number_'+i].t_id;
+									    }
+									}
+								};
+							
 								$('#task').append("<div id='id_t_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
 					
-								$('#id_t_'+i).render(data.tasks['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+								$('#id_t_'+i).render(data.tasks['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
 							}
 						}
 						if (data.notes != 1) {
-							for (i=0;i<10;i++){
+							for (i=0;i<20;i++){
+								directives = {
+									link: {
+									    href: function(params) {
+									    	return "?task_n=" + data.notes['number_'+i].t_id;
+									    }
+									}
+								};
 					
 								$('#notes').append("<div id='id_n_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
 					
-								$('#id_n_'+i).render(data.notes['number_'+i]); //рендерим свежевставленные дивы с шаблонами
+								$('#id_n_'+i).render(data.notes['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
 							}	
 						}
 				    });
-				});
+				}
 
 			</script>
 		
