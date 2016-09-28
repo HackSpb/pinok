@@ -306,3 +306,44 @@ color:green;
 .block_personal_task{
   padding-bottom:15px;
 }
+
+.button_task_no_calendar {
+  font-size: 18px; 
+  color: red;
+}
+
+.button_task_calendar {
+  font-size: 18px; 
+  color: green;
+}
+
+.button_task_user {
+  font-size: 18px; 
+  color: green;
+}
+
+.button_task_for_other {
+  font-size: 18px; 
+  color: blue;
+}
+
+.button_task_importan {
+  font-size: 18px; 
+  color: red;
+}
+
+.button_task_project {
+  font-size: 18px; 
+  color: black;
+}
+
+.button_task_event {
+  font-size: 18px; 
+  color: black;
+}
+
+.button_task_task {
+  font-size: 18px; 
+  color: black;
+}
+

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon.eot?qqgcxa');
-  src:  url('../fonts/icomoon.eot?qqgcxa#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?qqgcxa') format('truetype'),
-    url('../fonts/icomoon.woff?qqgcxa') format('woff'),
-    url('../fonts/icomoon.svg?qqgcxa#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?l5xhod');
+  src:  url('../fonts/icomoon.eot?l5xhod#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?l5xhod') format('truetype'),
+    url('../fonts/icomoon.woff?l5xhod') format('woff'),
+    url('../fonts/icomoon.svg?l5xhod#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-calendar-no:before {
+  content: "\e900";
+}
+.icon-for_other:before {
+  content: "\e901";
+}
 .icon-pencil2:before {
   content: "\e906";
 }
@@ -102,6 +108,4 @@
 .icon-skype:before {
   content: "\eac5";
 }
-
-
 

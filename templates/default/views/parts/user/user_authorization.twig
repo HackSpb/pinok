@@ -26,10 +26,10 @@
 						</div>
 						<div class="col-md-12">
 							<ul class="nav nav-tabs">
-							    <li><a href="#user" data-toggle="tab" aria-expanded="false"><div class="icon-user"></div></a></li>
-							    <li><a href="#calendar" data-toggle="tab" aria-expanded="false"><div class="icon-calendar"></div></a></li>
-							    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div class="icon-notification"></div></a></li>
-							    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div class="icon-price-tag"></div></a></li>
+							    <li><a href="#user" data-toggle="tab" aria-expanded="false"><div id="user_ico"><div class="icon-user button_task_user"></div></div></a></li>
+							    <li><a href="#calendar" data-toggle="tab" aria-expanded="false"><div id="calendar_ico"><div class="icon-calendar-no button_task_no_calendar"></div></div></a></li>
+							    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div id="importance_ico"><div class="icon-notification button_task_importan"></div></div></a></li>
+							    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div id="tags_ico"><div class="button_task_task">З</div></div></a></li>
 							</ul>
 							
 								<div id="myTabContent" class="tab-content">
@@ -60,9 +60,8 @@
 								  		<center><p>
 								  			<select id="task_type">
 								  				<option value="4">Проект</option>
-								  				<option value="62">Событие</option>
-								  				<option value="61">Мероприятие</option>
-								  				<option value="63" selected>Заметка</option>
+								  				<option value="61">Событие</option>
+								  				<option value="62" selected>Задача</option>
 								  			</select>
 								  		</p></center>
 								  	</div>
@@ -88,32 +87,60 @@
 				</div>
 			</div>
 			<script>
-				task_for_1.onfocus = function() {
+				task_for_1.onclick = function() {
 	  				if (this.value == 1) { 
-	  					this.className = "email";
+	  					this.className = 'email';
 	  					email.innerHTML = '';
+	  					this.className = 'user_ico';
+	  					user_ico.innerHTML = '';
+	  					user_ico.innerHTML = '<div class="icon-user button_task_user">';
 	  				}
 				};		
-				task_for_2.onfocus = function() {
+				task_for_2.onclick = function() {
 	  				if (this.value == 2) { 
-	  					this.className = "email";
+	  					this.className = 'email';
 	  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
+	  					this.className = 'user_ico';
+	  					user_ico.innerHTML = '';
+	  					user_ico.innerHTML = '<div class="icon-for_other button_task_for_other">';
 	  				}
 				};
 
-				deadline_on.onfocus = function() {
+				deadline_on.onclick = function() {
 					  if (this.value == 1) { 
 					  	this.className = "deadline";
 					  	deadline.innerHTML = '<center><select name="task_deadline" class="form-control" id="task_deadline_year">{% for i in 2016..2025 %}<option {% if "now"|date("Y") == i %}selected{% endif %} value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_month"><option {% if "now"|date("m") == 01 %}selected{% endif %} value="01">Январь</option><option {% if "now"|date("m") == 02 %}selected{% endif %} value="02">Февраль</option><option {% if "now"|date("m") == 03 %}selected{% endif %} value="03">Март</option><option {% if "now"|date("m") == 04 %}selected{% endif %} value="04">Апрель</option><option {% if "now"|date("m") == 05 %}selected{% endif %} value="05">Май</option><option {% if "now"|date("m") == 06 %}selected{% endif %} value="06">Июнь</option><option {% if "now"|date("m") == 07 %}selected{% endif %} value="07">Июль</option><option {% if "now"|date("m") == 08 %}selected{% endif %} value="08">Август</option><option {% if "now"|date("m") == 09 %}selected{% endif %} value="09">Сентябрь</option><option {% if "now"|date("m") == 10 %}selected{% endif %} value="10">Октябрь</option><option {% if "now"|date("m") == 11 %}selected{% endif %} value="11">Ноябрь</option><option {% if "now"|date("m") == 12 %}selected{% endif %} value="12">Декабрь</option></select><select name="task_deadline" class="form-control" id="task_deadline_day">{% for i in 1..31 %}<option {% if "now"|date("d") == i %}selected{% endif %} value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_hour">{% set h = "now"|date("H") + 1 %}{% for i in 0..23 %}<option {% if h == i %}selected{% endif %} value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></center>';
+					  	this.className = 'calendar_ico';
+	  					calendar_ico.innerHTML = '';
+	  					calendar_ico.innerHTML = '<div class="icon-calendar button_task_calendar">';
 					  }
 				};		
 
-				deadline_off.onfocus = function() {
+				deadline_off.onclick = function() {
 					  if (this.value == 0) { 
 					  	this.className = "deadline";
 					  	deadline.innerHTML = '';
+					  	this.className = 'calendar_ico';
+	  					calendar_ico.innerHTML = '';
+	  					calendar_ico.innerHTML = '<div class="icon-calendar-no button_task_no_calendar">';
 					  }
 				};
+
+				task_type.onclick = function() {
+					if (this.value == 4) { 
+						this.className = 'tags_ico';
+		  				tags_ico.innerHTML = '';
+		  				tags_ico.innerHTML = '<div class="button_task_project">П</div>';
+		  			} else if (this.value == 61) {
+		  				this.className = 'tags_ico';
+		  				tags_ico.innerHTML = '';
+		  				tags_ico.innerHTML = '<div class="button_task_event">С</div>';
+		  			} else if (this.value == 62) {
+		  				this.className = 'tags_ico';
+		  				tags_ico.innerHTML = '';
+		  				tags_ico.innerHTML = '<div class="button_task_task">З</div>';
+		  			}
+				}
 
 				function create_task(){
 					var task_for = $('input:radio[name=task_for]:checked').val();
