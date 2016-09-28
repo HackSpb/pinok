@@ -35,35 +35,35 @@
 								<div id="myTabContent" class="tab-content">
 								    <div class="tab-pane fade in" id="user">
 								    	<div class="form-group">
-											<label for="task_for" class="col-sm-3 control-label">Задача для:</label>
-											<div class="col-sm-9">
-												<input type="radio" name="task_for" id="task_for_1" checked value="1"> Для себя<Br>
-	   											<input type="radio" name="task_for" id="task_for_2" value="2"> Для другого<Br>
-											</div>
+								    		<center>
+												<button type="button" name="task_for" id="task_for_1" value="1">Для себя</button>
+												<button type="button" name="task_for" id="task_for_2" value="2">Для другого</button>
+											</center>
 										</div>
 										<div id="email"></div>
 								  	</div>
 								  	<div class="tab-pane fade" id="calendar">
 								  		<div class="form-group">
-											<label for="task_deadline" class="col-sm-3 control-label">Конечный срок</label>
-											<div class="col-sm-9">
-												<input type="radio" name="deadline_turn" id="deadline_on" value="1">Да
-   												<input type="radio" name="deadline_turn" id="deadline_off" checked value="0">Нет<Br>
-											</div>
-											<div class="col-sm-9" id="deadline"></div>
+												<center>
+													<button type="button" name="deadline_turn" id="deadline_on" value="1">Установить срок</button>
+													<button type="button" name="deadline_turn" id="deadline_off" value="0">Без срока</button>
+												</center>							
+											<div id="deadline"></div>
 										</div>
 								  	</div>
 								  	<div class="tab-pane fade" id="importance">
-								    	<p>важность - звездочки</p>
+								    	1 - <input type="checkbox" name="star_1">
+								    	2 - <input type="checkbox" name="star_2">
+								    	3 - <input type="checkbox" name="star_3">
+								    	4 - <input type="checkbox" name="star_4">
+								    	5 - <input type="checkbox" name="star_5">
 								  	</div>
 								  	<div class="tab-pane fade" id="tags">
-								  		<center><p>
-								  			<select id="task_type">
-								  				<option value="4">Проект</option>
-								  				<option value="61">Событие</option>
-								  				<option value="62" selected>Задача</option>
-								  			</select>
-								  		</p></center>
+								  		<center>
+											<p><button type="button" name="task_type_pr" id="task_type_pr" value="4">Проект</button></p>
+											<p><button type="button" name="task_type_ev" id="task_type_ev" value="61">Событие</button></p>
+											<p><button type="button" name="task_type_ta" id="task_type_ta" value="62">Задача</button></p>
+										</center>
 								  	</div>
 								</div>
 							</form>
@@ -126,16 +126,24 @@
 					  }
 				};
 
-				task_type.onclick = function() {
+				task_type_pr.onclick = function() {
 					if (this.value == 4) { 
 						this.className = 'tags_ico';
 		  				tags_ico.innerHTML = '';
 		  				tags_ico.innerHTML = '<div class="button_task_project">П</div>';
-		  			} else if (this.value == 61) {
+		  			} 
+		  		}
+
+		  		task_type_ev.onclick = function() {
+		  			if (this.value == 61) {
 		  				this.className = 'tags_ico';
 		  				tags_ico.innerHTML = '';
 		  				tags_ico.innerHTML = '<div class="button_task_event">С</div>';
-		  			} else if (this.value == 62) {
+		  			}  
+		  		}
+
+		  		task_type_ta.onclick = function() {
+		  			if (this.value == 62) {
 		  				this.className = 'tags_ico';
 		  				tags_ico.innerHTML = '';
 		  				tags_ico.innerHTML = '<div class="button_task_task">З</div>';
