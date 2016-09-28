@@ -10,8 +10,7 @@
 // 4 - project
 // (6 - task)
 // 61 - event
-// 62 - development
-// 63 - notes
+// 62 - task
 */
 
 /* roles in groups:
