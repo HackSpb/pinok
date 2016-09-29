@@ -317,6 +317,11 @@ color:green;
   color: green;
 }
 
+.button_task_imp {
+  font-size: 18px; 
+  color: blue;
+}
+
 .button_task_user {
   font-size: 18px; 
   color: green;
@@ -347,3 +352,41 @@ color:green;
   color: black;
 }
 
+.label_x
+{
+background-color:#9A9A9A;
+padding: 5px 12px;
+}
+.input_x[type=radio]
+{
+display:none;
+}
+.input_x[type=radio]:checked + .label_x
+{
+background-color:#9C3;
+}
+.input_s[type=radio]
+{
+display:none;
+}
+.label_s {
+  font-size:40px;
+}
+
+
+.rating {
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+.rating > .label_s {
+  display: inline-block;
+  position: relative;
+  font-size: 40px; 
+}
+.rating > .label_s:hover:before,
+.rating > .label_s:hover ~ .label_s:before,
+.rating > .input_s[type=radio]:checked ~ .label_s:before {
+   content: "\2605";
+   position: absolute;
+   color: yellow;
+};
