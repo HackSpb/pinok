@@ -170,20 +170,21 @@
 
 
 				create_task.onsubmit = function() {
-					var task_for = $('#task_for').val();
+					var task_for = $('input:radio[name=task_for]:checked').val();
 					var email_friend = $('#email_friend').val();
 					var task_name = $('#task_name').val();
-					var task_deadline_turn = $('input:radio[name=deadline_turn]:checked').val();		
+					var task_deadline_turn = $('input:radio[name=deadline]:checked').val();		
 					var task_deadline_year = $('#task_deadline_year').val();
 					var task_deadline_month = $('#task_deadline_month').val();
 					var task_deadline_day = $('#task_deadline_day').val();
 					var task_deadline_hour = $('#task_deadline_hour').val();
-					var task_type = $('#task_type').val();
+					var task_stars = $('input:radio[name=stars]:checked').val();
+					var task_type = $('input:radio[name=type]:checked').val();
 
-					//alert(task_for+email_friend+task_name+task_deadline_turn+task_deadline_year+task_deadline_month+task_deadline_day+task_deadline_hour+task_type);
-					alert(task_for);
+					//alert(task_for+' '+email_friend+' '+task_name+' '+task_deadline_turn+' '+task_deadline_year+' '+task_deadline_month+' '+task_deadline_day+' '+task_deadline_hour+' '+task_stars+' '+task_type);
 					
-					/*var query = "task_for="+task_for+"&email_friend="+email_friend+"&task_name="+task_name+"&task_deadline_turn="+task_deadline_turn+"&task_deadline_year="+task_deadline_year+"&task_deadline_month="+task_deadline_month+"&task_deadline_day="+task_deadline_day+"&task_deadline_hour="+task_deadline_hour+"&task_type="+task_type;	
+					var query = 'task_for='+task_for+'&email_friend='+email_friend+'&task_name='+task_name+'&task_deadline_turn='+task_deadline_turn+'&task_deadline_year='+task_deadline_year+'&task_deadline_month='+task_deadline_month+'&task_deadline_day='+task_deadline_day+'&task_deadline_hour='+task_deadline_hour+'&task_stars='+task_stars+'&task_type='+task_type;	
+					//alert(query);
 					$.ajax({
 						type: "POST",
 						url: "/task/do/create",
@@ -193,7 +194,7 @@
 							download_list();
 							return false;
 						}
-					});	*/	
+					});	
 				}
 
 				$(document).ready(function(){

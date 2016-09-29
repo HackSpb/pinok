@@ -4,12 +4,14 @@
 		$task_for = ($request->get('task_for') == 'undefined') ? 0 : $request->get('task_for');
 		$task[] = $email_friend = ($request->get('email_friend') == 'undefined') ? NULL : $request->get('email_friend');
 		$task[] = $task_name = ($request->get('task_name') == 'undefined') ? NULL : $request->get('task_name');
+		$task[] = $task_short_name = substr($task_name, 0, 20).'..';
 		$task_deadline_turn = ($request->get('task_deadline_turn') == 'undefined') ? 0 : $request->get('task_deadline_turn');
 		$task_deadline_year = ($request->get('task_deadline_year') == 'undefined') ? 0 : $request->get('task_deadline_year');
 		$task_deadline_month = ($request->get('task_deadline_month') == 'undefined') ? 0 : $request->get('task_deadline_month');
 		$task_deadline_day = ($request->get('task_deadline_day') == 'undefined') ? 0 : $request->get('task_deadline_day');
 		$task_deadline_hour = ($request->get('task_deadline_hour') == 'undefined') ? 0 : $request->get('task_deadline_hour');
 		$task[] = $task_type = ($request->get('task_type') == 'undefined') ? 0 : $request->get('task_type');
+		$task[] = $task_stars = ($request->get('task_stars') == 'undefined') ? 0 : $request->get('task_stars');
 		$task[] = $task_date_create = date("Y-m-d H:i:s");
 		$task[] = $task_date_finish = ($task_deadline_turn == 0) ? 'NULL' : $task_deadline_year.'-'.$task_deadline_month.'-'.$task_deadline_day.' '.$task_deadline_hour.':00:00';
 
