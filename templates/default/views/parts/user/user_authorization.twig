@@ -5,19 +5,24 @@
 			</div>
 			<div class="row main_block_special">
 					<div class="col-md-2" style="background:#A4ABB7; height:700px">
-						<a href="?task_n=main"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные дела</div></a>
-						<a onclick="$('#project').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
-						<div id="project" style=""></div>
-						<a onclick="$('#task').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
-						<div id="task" style=""></div>
-						<a onclick="$('#notes').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Заметки</div></a>
-						<div id="notes" style=""></div>
+						<a href="?task_n=imp"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные</div></a>
+						<div id="imp"></div>
+						<a href="?task_n=last"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Последние</div></a>
+						<div id="last"></div>
+						<a href="?task_n=fav"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Избранные</div></a>
+						<div id="favourite"></div>
+						<a onclick="$('#all').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Все</div></a>
+						<div id="all" style="display: none;">
+							<a href="?task_n=proj"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
+							<a href="?task_n=even"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">События</div></a>
+							<a href="?task_n=task"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
+						</div>
 					</div>
 					<div class="col-md-7">
 						<div id="content"></div>
 					</div>
 					<div class="col-md-3" style="background:#A4ABB7">
-						<form id="create_task">
+						<form id="create_task_form">
 							<div class="row">
 								<div class="col-md-8">
 									<input type="text" id="task_name" required>
@@ -92,7 +97,7 @@
 
 			</div>
 			<div class="temp_task" id="temp_task" style="display:none">			
-				<a class="link"><div class="1"></div></a>
+				<a class="link"><div class="t_short_name"></div></a>
 			</div>
 			<div class="col-md-4" style="display:none">
 				<div class="home-info-block" style="height:220px; margin-top: 20px;">
@@ -174,7 +179,7 @@
 				};
 
 
-				create_task.onsubmit = function() {
+				create_task_form.onsubmit = function() {
 					var task_for = $('input:radio[name=task_for]:checked').val();
 					var email_friend = $('#email_friend').val();
 					var task_name = $('#task_name').val();
@@ -204,6 +209,7 @@
 								download_list();
 							}
 						});	
+						$('#create_task_form')[0].reset();
 						return false;
 					}
 				}
@@ -219,48 +225,48 @@
 				        var i; 
 				       
 				        var s = $('#temp_task').html();// берем образцовый хтмл из скрытого шаблона 
-				        if (data.projects != 1) {
+				        if (data.imp != 1) {
 							for (i=0;i<50;i++){
 								directives = {
 									link: {
 									    href: function(params) {
-									    	return "?task_n=" + data.projects['number_'+i].t_id;
+									    	return "?task_n=" + data.imp['number_'+i].t_id;
 										}
 									}
 								};
-								$('#project').append("<div id='id_p_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+								$('#imp').append("<div id='id_imp_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
 					
-								$('#id_p_'+i).render(data.projects['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
+								$('#id_imp_'+i).render(data.imp['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
 							}	
 						}
-						if (data.tasks != 1) {
+						if (data.last != 1) {
 							for (i=0;i<50;i++){
 								directives = {
 									link: {
 									    href: function(params) {
-									    	return "?task_n=" + data.tasks['number_'+i].t_id;
+									    	return "?task_n=" + data.last['number_'+i].t_id;
 									    }
 									}
 								};
 							
-								$('#task').append("<div id='id_t_"+i+"'>"+ s + "</div>"); 
+								$('#last').append("<div id='id_last_"+i+"'>"+ s + "</div>"); 
 					
-								$('#id_t_'+i).render(data.tasks['number_'+i], directives); 
+								$('#id_last_'+i).render(data.last['number_'+i], directives); 
 							}
 						}
-						if (data.notes != 1) {
+						if (data.fav != 1) {
 							for (i=0;i<50;i++){
 								directives = {
 									link: {
 									    href: function(params) {
-									    	return "?task_n=" + data.notes['number_'+i].t_id;
+									    	return "?task_n=" + data.fav['number_'+i].t_id;
 									    }
 									}
 								};
 					
-								$('#notes').append("<div id='id_n_"+i+"'>"+ s + "</div>"); 
+								$('#favourite').append("<div id='id_fav_"+i+"'>"+ s + "</div>"); 
 					
-								$('#id_n_'+i).render(data.notes['number_'+i], directives); 
+								$('#id_fav_'+i).render(data.fav['number_'+i], directives); 
 							}	
 						}
 				    });

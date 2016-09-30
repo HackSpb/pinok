@@ -291,43 +291,54 @@
 	function task_select_list($request) {
 		global $dbh;
 
-		$sql = "SELECT t_id, t_name FROM tasks WHERE t_type = 61 OR t_type = 62";
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id = :u_id AND t_type != 4 ORDER BY t_raiting DESC LIMIT 5";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$sth->execute();
-		$result_tasks = $sth->fetchAll();
+		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$important_tasks = $sth->fetchAll();
 		
-		$count_result_tasks = count($result_tasks);
+		if (count($important_tasks) > 0) {
+			$count_important_tasks = count($important_tasks);
 			
-		for ($stroka_v_massive = 0; $stroka_v_massive < $count_result_tasks; $stroka_v_massive++) {
-			$result_new_tasks['number_' . $stroka_v_massive] = $result_tasks[$stroka_v_massive];
+			for ($stroka_v_massive = 0; $stroka_v_massive < $count_important_tasks; $stroka_v_massive++) {
+				$important_new_tasks['number_' . $stroka_v_massive] = $important_tasks[$stroka_v_massive];
+			}
+		} else {
+			$important_new_tasks = 1;
 		}
-		if(count(@$result_new_tasks)<1) $result_new_tasks = 1;
 
-		$sql = "SELECT t_id, t_name FROM tasks WHERE t_type = 63";
+
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=1 AND u_id = :u_id AND t_type != 4 ORDER BY t_date_create DESC LIMIT 5";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$sth->execute();
-		$result_notes = $sth->fetchAll();
+		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$last_tasks = $sth->fetchAll();
 		
-		$count_result_notes = count($result_notes);
+		if (count($last_tasks) > 0) {
+			$count_last_tasks = count($last_tasks);
 			
-		for ($stroka_v_massive = 0; $stroka_v_massive < $count_result_notes; $stroka_v_massive++) {
-			$result_new_notes['number_' . $stroka_v_massive] = $result_notes[$stroka_v_massive];
+			for ($stroka_v_massive = 0; $stroka_v_massive < $count_last_tasks; $stroka_v_massive++) {
+				$last_new_tasks['number_' . $stroka_v_massive] = $last_tasks[$stroka_v_massive];
+			}
+		} else {
+			$last_new_tasks = 1;
 		}
-		if(count(@$result_new_notes)<1) $result_new_notes = 1;
 
-		$sql = "SELECT t_id, t_name FROM tasks WHERE t_type = 4";
+
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN tasks_favourite USING (t_id) WHERE u_id = :u_id ORDER BY t_date_create DESC LIMIT 15";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$sth->execute();
-		$result_projects = $sth->fetchAll();
+		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$favourite_tasks = $sth->fetchAll();
 		
-		$count_result_projects = count($result_projects);
+		if (count($favourite_tasks) > 0) {
+			$count_favourite_tasks = count($favourite_tasks);
 			
-		for ($stroka_v_massive = 0; $stroka_v_massive < $count_result_projects; $stroka_v_massive++) {
-			$result_new_projects['number_' . $stroka_v_massive] = $result_projects[$stroka_v_massive];
+			for ($stroka_v_massive = 0; $stroka_v_massive < $count_favourite_tasks; $stroka_v_massive++) {
+				$favourite_new_tasks['number_' . $stroka_v_massive] = $favourite_tasks[$stroka_v_massive];
+			}
+		} else {
+			$favourite_new_tasks = 1;
 		}
-		if(count(@$result_new_projects)<1) $result_new_projects = 1;
 
-		$result = array('tasks' => @$result_new_tasks, 'notes' => @$result_new_notes, 'projects' => @$result_new_projects);
+		$result = array('imp' => $important_new_tasks, 'last' => $last_new_tasks, 'fav' => $favourite_new_tasks);
 		return json_encode ($result);
 	}
 	
