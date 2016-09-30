@@ -4,7 +4,13 @@
 		$task_for = ($request->get('task_for') == 'undefined') ? 0 : $request->get('task_for');
 		$task[] = $email_friend = ($request->get('email_friend') == 'undefined') ? NULL : $request->get('email_friend');
 		$task[] = $task_name = ($request->get('task_name') == 'undefined') ? NULL : $request->get('task_name');
-		$task[] = $task_short_name = mb_substr($task_name, 0, 20, 'UTF-8').'..';
+		$name_array =  preg_split("//u", $task_name);
+		$count_name_array = count($name_array) - 2;
+		if ($count_name_array < 21) {
+			$task[] = $task_short_name = $task_name;
+		} else {
+			$task[] = $task_short_name = mb_substr($task_name, 0, 20, 'UTF-8').'..';
+		}
 		$task_deadline_turn = ($request->get('task_deadline_turn') == 'undefined') ? 0 : $request->get('task_deadline_turn');
 		$task_deadline_year = ($request->get('task_deadline_year') == 'undefined') ? 0 : $request->get('task_deadline_year');
 		$task_deadline_month = ($request->get('task_deadline_month') == 'undefined') ? 0 : $request->get('task_deadline_month');

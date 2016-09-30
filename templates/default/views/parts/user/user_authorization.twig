@@ -210,6 +210,19 @@
 							}
 						});	
 						$('#create_task_form')[0].reset();
+						this.className = 'user_ico';
+		  				user_ico.innerHTML = '<div class="icon-user button_task_user"></div>';
+		  				this.className = 'calendar_ico';
+		  				calendar_ico.innerHTML = '<div class="icon-calendar button_task_no_calendar"></div>';
+		  				this.className = 'importance_ico';
+		  				importance_ico.innerHTML = '<div class="icon-notification button_task_importan"></div>';
+		  				this.className = 'tags_ico';
+		  				tags_ico.innerHTML = '<div class="button_task_task">З</div>';
+
+		  				this.className = 'email';
+		  				email.innerHTML = '';
+		  				this.className = 'deadline_date';
+		  				deadline_date.innerHTML = '';
 						return false;
 					}
 				}
