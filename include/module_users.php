@@ -64,10 +64,6 @@
 		$sth->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create));
 		$result_task = $sth->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
-		$stm = $dbh->prepare($sql);
-		$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $_SESSION['user']['u_id'], ':ut_role_exec' => 2));
-
 		$sql = "INSERT INTO groups (t_id, u_id, g_user_role) VALUES (:t_id, :u_id, :g_user_role_cr), (:t_id, :u_id, :g_user_role_ad)";
 		$stm = $dbh->prepare($sql);
 		$stm->execute(array(':u_id' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':g_user_role_cr' => 2, ':g_user_role_ad' => 4));

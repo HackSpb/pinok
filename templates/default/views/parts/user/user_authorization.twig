@@ -58,8 +58,8 @@
 													<input type="radio" id="calendar_2" class="input_x" onclick="deadline_for_task()" name="deadline" value="2" checked />
 													<label class="label_x" for="calendar_2">Без срока</label>
 												</center>						
-												<div id="deadline_date"></div>
 											</div>
+											<div id="deadline_date"></div>
 									  	</div>
 									  	<div class="tab-pane fade" id="importance">
 									  		<center>
@@ -87,9 +87,9 @@
 												<label class="label_x" for="type_3">Задача</label></p>										
 											</center>
 									  	</div>
-									</div>
-								</form>
-							</div>
+									</div>								
+								</div>
+							</form>
 							<div class="row">
 								<div id="answer"></div>
 							</div>						
@@ -111,179 +111,5 @@
 					<p></p>
 				</div>
 			</div>
-			<script>
-
-				function task_for_user() {
-					var task_for = $('input:radio[name=task_for]:checked').val();
-						$("#answer").html('');
-		  				if (task_for == '1') { 
-		  					this.className = 'email';
-		  					email.innerHTML = '';
-		  					this.className = 'user_ico';
-		  					user_ico.innerHTML = '<div class="icon-user button_task_user">';
-		  				} else if (task_for == '2') { 
-		  					this.className = 'email';
-		  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
-		  					this.className = 'user_ico';
-		  					user_ico.innerHTML = '<div class="icon-for_other button_task_for_other">';
-		  				}
-				};
-
-				function deadline_for_task() {
-					var deadline = $('input:radio[name=deadline]:checked').val();
-	  				if (deadline == '1') { 
-	  					this.className = 'deadline_date';
-					  	deadline_date.innerHTML = '<center><select name="task_deadline" class="form-control" id="task_deadline_year">{% for i in 2016..2025 %}<option {% if "now"|date("Y") == i %}selected{% endif %} value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_month"><option {% if "now"|date("m") == 01 %}selected{% endif %} value="01">Январь</option><option {% if "now"|date("m") == 02 %}selected{% endif %} value="02">Февраль</option><option {% if "now"|date("m") == 03 %}selected{% endif %} value="03">Март</option><option {% if "now"|date("m") == 04 %}selected{% endif %} value="04">Апрель</option><option {% if "now"|date("m") == 05 %}selected{% endif %} value="05">Май</option><option {% if "now"|date("m") == 06 %}selected{% endif %} value="06">Июнь</option><option {% if "now"|date("m") == 07 %}selected{% endif %} value="07">Июль</option><option {% if "now"|date("m") == 08 %}selected{% endif %} value="08">Август</option><option {% if "now"|date("m") == 09 %}selected{% endif %} value="09">Сентябрь</option><option {% if "now"|date("m") == 10 %}selected{% endif %} value="10">Октябрь</option><option {% if "now"|date("m") == 11 %}selected{% endif %} value="11">Ноябрь</option><option {% if "now"|date("m") == 12 %}selected{% endif %} value="12">Декабрь</option></select><select name="task_deadline" class="form-control" id="task_deadline_day">{% for i in 1..31 %}<option {% if "now"|date("d") == i %}selected{% endif %} value="{{ i }}">{{ i }}</option>{% endfor %}</select><select name="task_deadline" class="form-control" id="task_deadline_hour">{% set h = "now"|date("H") + 1 %}{% for i in 0..23 %}<option {% if h == i %}selected{% endif %} value="{{ i }}">{{ i }}:00</option>{% endfor %}</select></center>';
-					  	this.className = 'calendar_ico';
-	  					calendar_ico.innerHTML = '<div class="icon-calendar button_task_calendar">';
-	  				} else if (deadline == '2') { 
-	  					this.className = 'deadline_date';
-					  	deadline_date.innerHTML = '';
-					  	this.className = 'calendar_ico';
-	  					calendar_ico.innerHTML = '<div class="icon-calendar button_task_no_calendar">';
-	  				}
-				};
-
-				function raiting_for_task() {
-					var stars = $('input:radio[name=stars]:checked').val();
-	  				if (stars == '1') { 
-	  					this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="button_task_imp">1</div>';
-	  				} else if (stars == '2') { 
-	  					this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="button_task_imp">2</div>';
-	  				} else if (stars == '3') { 
-	  					this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="button_task_imp">3</div>';
-	  				} else if (stars == '4') { 
-	  					this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="button_task_imp">4</div>';
-	  				} else if (stars == '5') { 
-	  					this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="button_task_imp">5</div>';
-	  				}
-				};
-
-				function type_for_task() {
-					var type = $('input:radio[name=type]:checked').val();
-	  				if (type == '4') { 
-	  					this.className = 'tags_ico';
-		  				tags_ico.innerHTML = '<div class="button_task_project">П</div>';
-	  				} else if (type == '61') { 
-	  					this.className = 'tags_ico';
-		  				tags_ico.innerHTML = '<div class="button_task_event">С</div>';
-	  				} else if (type == '62') { 
-	  					this.className = 'tags_ico';
-		  				tags_ico.innerHTML = '<div class="button_task_task">З</div>';
-	  				}
-				};
-
-
-				create_task_form.onsubmit = function() {
-					var task_for = $('input:radio[name=task_for]:checked').val();
-					var email_friend = $('#email_friend').val();
-					var task_name = $('#task_name').val();
-					var task_deadline_turn = $('input:radio[name=deadline]:checked').val();		
-					var task_deadline_year = $('#task_deadline_year').val();
-					var task_deadline_month = $('#task_deadline_month').val();
-					var task_deadline_day = $('#task_deadline_day').val();
-					var task_deadline_hour = $('#task_deadline_hour').val();
-					var task_stars = $('input:radio[name=stars]:checked').val();
-					var task_type = $('input:radio[name=type]:checked').val();
-
-					//alert(task_for+' '+email_friend+' '+task_name+' '+task_deadline_turn+' '+task_deadline_year+' '+task_deadline_month+' '+task_deadline_day+' '+task_deadline_hour+' '+task_stars+' '+task_type);
-					if (task_for == 2 && task_type == 4) {
-						var answer = '<div class="alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Внимание! </strong> Вы можете создать проект только для себя.</div>';
-						$("#answer").html(answer);
-						return false;
-					} else {
-						var query = 'task_for='+task_for+'&email_friend='+email_friend+'&task_name='+task_name+'&task_deadline_turn='+task_deadline_turn+'&task_deadline_year='+task_deadline_year+'&task_deadline_month='+task_deadline_month+'&task_deadline_day='+task_deadline_day+'&task_deadline_hour='+task_deadline_hour+'&task_stars='+task_stars+'&task_type='+task_type;	
-						//alert(query);
-						//return false;
-						$.ajax({
-							type: "POST",
-							url: "/task/do/create",
-							data: query,
-							success: function(answer) {
-								$("#answer").html(answer);
-								download_list();
-							}
-						});	
-						$('#create_task_form')[0].reset();
-						this.className = 'user_ico';
-		  				user_ico.innerHTML = '<div class="icon-user button_task_user"></div>';
-		  				this.className = 'calendar_ico';
-		  				calendar_ico.innerHTML = '<div class="icon-calendar button_task_no_calendar"></div>';
-		  				this.className = 'importance_ico';
-		  				importance_ico.innerHTML = '<div class="icon-notification button_task_importan"></div>';
-		  				this.className = 'tags_ico';
-		  				tags_ico.innerHTML = '<div class="button_task_task">З</div>';
-
-		  				this.className = 'email';
-		  				email.innerHTML = '';
-		  				this.className = 'deadline_date';
-		  				deadline_date.innerHTML = '';
-						return false;
-					}
-				}
-
-				$(document).ready(function(){
-				    download_list();
-				});
-
-				function download_list(){
-					$.getJSON("/task/select/list",
-				        function(data){
-				        console.log(data);
-				        var i; 
-				       
-				        var s = $('#temp_task').html();// берем образцовый хтмл из скрытого шаблона 
-				        if (data.imp != 1) {
-							for (i=0;i<50;i++){
-								directives = {
-									link: {
-									    href: function(params) {
-									    	return "?task_n=" + data.imp['number_'+i].t_id;
-										}
-									}
-								};
-								$('#imp').append("<div id='id_imp_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
-					
-								$('#id_imp_'+i).render(data.imp['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
-							}	
-						}
-						if (data.last != 1) {
-							for (i=0;i<50;i++){
-								directives = {
-									link: {
-									    href: function(params) {
-									    	return "?task_n=" + data.last['number_'+i].t_id;
-									    }
-									}
-								};
-							
-								$('#last').append("<div id='id_last_"+i+"'>"+ s + "</div>"); 
-					
-								$('#id_last_'+i).render(data.last['number_'+i], directives); 
-							}
-						}
-						if (data.fav != 1) {
-							for (i=0;i<50;i++){
-								directives = {
-									link: {
-									    href: function(params) {
-									    	return "?task_n=" + data.fav['number_'+i].t_id;
-									    }
-									}
-								};
-					
-								$('#favourite').append("<div id='id_fav_"+i+"'>"+ s + "</div>"); 
-					
-								$('#id_fav_'+i).render(data.fav['number_'+i], directives); 
-							}	
-						}
-				    });
-				}
-
-			</script>
+			<script type="text/javascript" src="{{asset('templates/default/js/form_task_create.js')}}"></script>
 		
