@@ -18,74 +18,78 @@
 					</div>
 					<div class="col-md-3" style="background:#A4ABB7">
 						<form id="create_task">
-						<div class="col-md-8">
-							<input type="text" id="task_name" required>
-						</div>
-						<div class=" col-md-offset-1 col-md-3">
-							<input type="submit" class="btn" value="го">
-						</div>
-						<div class="col-md-12">
-							<ul class="nav nav-tabs">
-							    <li><a href="#user" data-toggle="tab" aria-expanded="false"><div id="user_ico"><div class="icon-user button_task_user"></div></div></a></li>
-							    <li><a href="#calendar" data-toggle="tab" aria-expanded="false"><div id="calendar_ico"><div class="icon-calendar button_task_no_calendar"></div></div></a></li>
-							    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div id="importance_ico"><div class="icon-notification button_task_importan"></div></div></a></li>
-							    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div id="tags_ico"><div class="button_task_task">З</div></div></a></li>
-							</ul>
-							
-								<div id="myTabContent" class="tab-content">
-								    <div class="tab-pane fade in" id="user">
-								    	<div class="form-group">
-								    		<center>
-									    		<input type="radio" id="email_1" class="input_x" onclick="task_for_user()" name="task_for" value="1" checked />
-												<label class="label_x" for="email_1">Для себя</label>
-												<input type="radio" id="email_2" class="input_x" onclick="task_for_user()" name="task_for" value="2" />
-												<label class="label_x" for="email_2">Для другого</label>
-											</center>
-										</div>
-										<div id="email"></div>
-								  	</div>
-								  	<div class="tab-pane fade" id="calendar">
-								  		<div class="form-group">
-											<center>
-									    		<input type="radio" id="calendar_1" class="input_x" onclick="deadline_for_task()" name="deadline" value="1" />
-												<label class="label_x" for="calendar_1">Установить срок</label>
-												<input type="radio" id="calendar_2" class="input_x" onclick="deadline_for_task()" name="deadline" value="2" checked />
-												<label class="label_x" for="calendar_2">Без срока</label>
-											</center>						
-											<div id="deadline_date"></div>
-										</div>
-								  	</div>
-								  	<div class="tab-pane fade" id="importance">
-								  		<center>
-									    	<div class="rating">
-									    		<input type="radio" id="star_5" class="input_s" onclick="raiting_for_task()" name="stars" value="5" />
-											    <label for="star_5" class="label_s"> &#9734;</label>
-											    <input type="radio" id="star_4" class="input_s" onclick="raiting_for_task()" name="stars" value="4" />
-											    <label for="star_4" class="label_s"> &#9734;</label>
-											    <input type="radio" id="star_3" class="input_s" onclick="raiting_for_task()" name="stars" value="3" />
-											    <label for="star_3" class="label_s"> &#9734;</label>
-											    <input type="radio" id="star_2" class="input_s" onclick="raiting_for_task()" name="stars" value="2" />
-											    <label for="star_2" class="label_s"> &#9734;</label>
-												<input type="radio" id="star_1" class="input_s" onclick="raiting_for_task()" name="stars" value="1" />
-											    <label for="star_1" class="label_s"> &#9734;</label>
-											</div>
-										</center>
-								  	</div>
-								  	<div class="tab-pane fade" id="tags">
-								  		<center>								
-									    	<p><input type="radio" id="type_1" class="input_x" onclick="type_for_task()" name="type" value="4" />
-											<label class="label_x" for="type_1">Проект</label></p>
-											<p><input type="radio" id="type_2" class="input_x" onclick="type_for_task()" name="type" value="61" />
-											<label class="label_x" for="type_2">Событие</label></p>
-											<p><input type="radio" id="type_3" class="input_x" onclick="type_for_task()" name="type" value="62" checked />
-											<label class="label_x" for="type_3">Задача</label></p>										
-										</center>
-								  	</div>
+							<div class="row">
+								<div class="col-md-8">
+									<input type="text" id="task_name" required>
 								</div>
-							</form>
-						</div>
-						<div id="answer"></div>
+								<div class=" col-md-offset-1 col-md-3">
+									<input type="submit" class="btn" value="го">
+								</div>
+							</div>
+							<div class="row">								
+									<ul class="nav nav-tabs">									
+									    <li><a href="#user" data-toggle="tab" aria-expanded="false"><div id="user_ico"><div class="icon-user button_task_user"></div></div></a></li>
+									    <li><a href="#calendar" data-toggle="tab" aria-expanded="false"><div id="calendar_ico"><div class="icon-calendar button_task_no_calendar"></div></div></a></li>
+									    <li><a href="#importance" data-toggle="tab" aria-expanded="false"><div id="importance_ico"><div class="icon-notification button_task_importan"></div></div></a></li>
+									    <li><a href="#tags" data-toggle="tab" aria-expanded="false"><div id="tags_ico"><div class="button_task_task">З</div></div></a></li>									
+									</ul>								
+									<div id="myTabContent" class="tab-content">
+									    <div class="tab-pane fade in" id="user">
+									    	<div class="form-group">
+									    		<center>								  
+										    		<input type="radio" id="email_1" class="input_x" onclick="task_for_user()" name="task_for" value="1" checked />
+													<label class="label_x" for="email_1">Для себя</label>
+													<input type="radio" id="email_2" class="input_x" onclick="task_for_user()" name="task_for" value="2" />
+													<label class="label_x" for="email_2">Для другого</label>
+												</center>
+											</div>
+											<div id="email"></div>
+									  	</div>
+									  	<div class="tab-pane fade" id="calendar">
+									  		<div class="form-group">
+												<center>
+										    		<input type="radio" id="calendar_1" class="input_x" onclick="deadline_for_task()" name="deadline" value="1" />
+													<label class="label_x" for="calendar_1">Установить срок</label>
+													<input type="radio" id="calendar_2" class="input_x" onclick="deadline_for_task()" name="deadline" value="2" checked />
+													<label class="label_x" for="calendar_2">Без срока</label>
+												</center>						
+												<div id="deadline_date"></div>
+											</div>
+									  	</div>
+									  	<div class="tab-pane fade" id="importance">
+									  		<center>
+										    	<div class="rating">
+										    		<input type="radio" id="star_5" class="input_s" onclick="raiting_for_task()" name="stars" value="5" />
+												    <label for="star_5" class="label_s"> &#9734;</label>
+												    <input type="radio" id="star_4" class="input_s" onclick="raiting_for_task()" name="stars" value="4" />
+												    <label for="star_4" class="label_s"> &#9734;</label>
+												    <input type="radio" id="star_3" class="input_s" onclick="raiting_for_task()" name="stars" value="3" />
+												    <label for="star_3" class="label_s"> &#9734;</label>
+												    <input type="radio" id="star_2" class="input_s" onclick="raiting_for_task()" name="stars" value="2" />
+												    <label for="star_2" class="label_s"> &#9734;</label>
+													<input type="radio" id="star_1" class="input_s" onclick="raiting_for_task()" name="stars" value="1" />
+												    <label for="star_1" class="label_s"> &#9734;</label>
+												</div>
+											</center>
+									  	</div>
+									  	<div class="tab-pane fade" id="tags">
+									  		<center>								
+										    	<p><input type="radio" id="type_1" class="input_x" onclick="type_for_task()" name="type" value="4" />
+												<label class="label_x" for="type_1">Проект</label></p>
+												<p><input type="radio" id="type_2" class="input_x" onclick="type_for_task()" name="type" value="61" />
+												<label class="label_x" for="type_2">Событие</label></p>
+												<p><input type="radio" id="type_3" class="input_x" onclick="type_for_task()" name="type" value="62" checked />
+												<label class="label_x" for="type_3">Задача</label></p>										
+											</center>
+									  	</div>
+									</div>
+								</form>
+							</div>
+							<div class="row">
+								<div id="answer"></div>
+							</div>						
 					</div>
+
 			</div>
 			<div class="temp_task" id="temp_task" style="display:none">			
 				<a class="link"><div class="1"></div></a>
@@ -106,17 +110,18 @@
 
 				function task_for_user() {
 					var task_for = $('input:radio[name=task_for]:checked').val();
-	  				if (task_for == '1') { 
-	  					this.className = 'email';
-	  					email.innerHTML = '';
-	  					this.className = 'user_ico';
-	  					user_ico.innerHTML = '<div class="icon-user button_task_user">';
-	  				} else if (task_for == '2') { 
-	  					this.className = 'email';
-	  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
-	  					this.className = 'user_ico';
-	  					user_ico.innerHTML = '<div class="icon-for_other button_task_for_other">';
-	  				}
+						$("#answer").html('');
+		  				if (task_for == '1') { 
+		  					this.className = 'email';
+		  					email.innerHTML = '';
+		  					this.className = 'user_ico';
+		  					user_ico.innerHTML = '<div class="icon-user button_task_user">';
+		  				} else if (task_for == '2') { 
+		  					this.className = 'email';
+		  					email.innerHTML = '<div class="form-group"><label for="email_friend" class="col-sm-3 control-label">Email</label><div class="col-sm-9"><input type="email" name="email_friend" class="form-control" id="email_friend" required></div></div>';
+		  					this.className = 'user_ico';
+		  					user_ico.innerHTML = '<div class="icon-for_other button_task_for_other">';
+		  				}
 				};
 
 				function deadline_for_task() {
@@ -182,19 +187,25 @@
 					var task_type = $('input:radio[name=type]:checked').val();
 
 					//alert(task_for+' '+email_friend+' '+task_name+' '+task_deadline_turn+' '+task_deadline_year+' '+task_deadline_month+' '+task_deadline_day+' '+task_deadline_hour+' '+task_stars+' '+task_type);
-					
-					var query = 'task_for='+task_for+'&email_friend='+email_friend+'&task_name='+task_name+'&task_deadline_turn='+task_deadline_turn+'&task_deadline_year='+task_deadline_year+'&task_deadline_month='+task_deadline_month+'&task_deadline_day='+task_deadline_day+'&task_deadline_hour='+task_deadline_hour+'&task_stars='+task_stars+'&task_type='+task_type;	
-					//alert(query);
-					$.ajax({
-						type: "POST",
-						url: "/task/do/create",
-						data: query,
-						success: function(answer) {
-							$("#answer").html(answer);
-							download_list();
-							return false;
-						}
-					});	
+					if (task_for == 2 && task_type == 4) {
+						var answer = '<div class="alert alert-dismissible alert-warning"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Внимание! </strong> Вы можете создать проект только для себя.</div>';
+						$("#answer").html(answer);
+						return false;
+					} else {
+						var query = 'task_for='+task_for+'&email_friend='+email_friend+'&task_name='+task_name+'&task_deadline_turn='+task_deadline_turn+'&task_deadline_year='+task_deadline_year+'&task_deadline_month='+task_deadline_month+'&task_deadline_day='+task_deadline_day+'&task_deadline_hour='+task_deadline_hour+'&task_stars='+task_stars+'&task_type='+task_type;	
+						//alert(query);
+						//return false;
+						$.ajax({
+							type: "POST",
+							url: "/task/do/create",
+							data: query,
+							success: function(answer) {
+								$("#answer").html(answer);
+								download_list();
+							}
+						});	
+						return false;
+					}
 				}
 
 				$(document).ready(function(){
@@ -232,9 +243,9 @@
 									}
 								};
 							
-								$('#task').append("<div id='id_t_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+								$('#task').append("<div id='id_t_"+i+"'>"+ s + "</div>"); 
 					
-								$('#id_t_'+i).render(data.tasks['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
+								$('#id_t_'+i).render(data.tasks['number_'+i], directives); 
 							}
 						}
 						if (data.notes != 1) {
@@ -247,9 +258,9 @@
 									}
 								};
 					
-								$('#notes').append("<div id='id_n_"+i+"'>"+ s + "</div>"); // плодим дивы по нашему шаблону с уникальными ид
+								$('#notes').append("<div id='id_n_"+i+"'>"+ s + "</div>"); 
 					
-								$('#id_n_'+i).render(data.notes['number_'+i], directives); //рендерим свежевставленные дивы с шаблонами
+								$('#id_n_'+i).render(data.notes['number_'+i], directives); 
 							}	
 						}
 				    });

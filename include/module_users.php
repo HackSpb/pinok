@@ -4,7 +4,7 @@
 		$task_for = ($request->get('task_for') == 'undefined') ? 0 : $request->get('task_for');
 		$task[] = $email_friend = ($request->get('email_friend') == 'undefined') ? NULL : $request->get('email_friend');
 		$task[] = $task_name = ($request->get('task_name') == 'undefined') ? NULL : $request->get('task_name');
-		$task[] = $task_short_name = substr($task_name, 0, 20).'..';
+		$task[] = $task_short_name = mb_substr($task_name, 0, 20, 'UTF-8').'..';
 		$task_deadline_turn = ($request->get('task_deadline_turn') == 'undefined') ? 0 : $request->get('task_deadline_turn');
 		$task_deadline_year = ($request->get('task_deadline_year') == 'undefined') ? 0 : $request->get('task_deadline_year');
 		$task_deadline_month = ($request->get('task_deadline_month') == 'undefined') ? 0 : $request->get('task_deadline_month');
@@ -22,7 +22,7 @@
 					</div>";
 		}
 		
-		//return $task_for.'<br>'.$email_friend.'<br>'.$task_name.'<br>'.$task_date_create.'<br>'.$task_date_finish.'<br>'.$task_type;
+		//return $task_for.'<br>'.$email_friend.'<br>'.$task_name.'<br>'.$task_short_name.'<br>'.$task_date_create.'<br>'.$task_date_finish.'<br>'.$task_type;
 
 		global $dbh;
 		global $config;
@@ -41,14 +41,17 @@
 	}
 
 	function create_project($task, $dbh){
+		$t_email_fr=$task[0];
 		$t_name=$task[1];
-		$t_type=$task[2];
-		$t_create=$task[3];
-		$t_finish=$task[4];
+		$t_short_name=$task[2];
+		$t_type=$task[3];
+		$t_stars=$task[4];
+		$t_create=$task[5];
+		$t_finish=$task[6];
 
-		$sql = "INSERT INTO tasks (t_name, t_date_create, t_date_finish, t_type, t_accept_with_task) VALUES (:t_name, :t_date_create, :t_date_finish, :t_type, :t_accept_with_task)";
+		$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type, t_accept_with_task) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type, :t_accept_with_task)";
 		$stm = $dbh->prepare($sql);
-		$stm->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_type' => $t_type, ':t_accept_with_task' => 1));
+		$stm->execute(array(':t_name' => $t_name, ':t_short_name' => $t_short_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_raiting' => $t_stars, ':t_type' => $t_type, ':t_accept_with_task' => 1));
 
 		$sql = "SELECT * FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -71,16 +74,19 @@
 
 	function create_personal_task($task, $dbh){
 		//for me
+		$t_email_fr=$task[0];
 		$t_name=$task[1];
-		$t_type=$task[2];
-		$t_create=$task[3];
-		$t_finish=$task[4];
+		$t_short_name=$task[2];
+		$t_type=$task[3];
+		$t_stars=$task[4];
+		$t_create=$task[5];
+		$t_finish=$task[6];
 
-		$sql = "INSERT INTO tasks (t_name, t_date_create, t_date_finish, t_type, t_accept_with_task) VALUES (:t_name, :t_date_create, :t_date_finish, :t_type, :t_accept_with_task)";
+		$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type, t_accept_with_task) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type, :t_accept_with_task)";
 		$stm = $dbh->prepare($sql);
-		$stm->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_type' => $t_type, ':t_accept_with_task' => 1));
+		$stm->execute(array(':t_name' => $t_name, ':t_short_name' => $t_short_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_raiting' => $t_stars, ':t_type' => $t_type, ':t_accept_with_task' => 1));
 
-		$sql = "SELECT * FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
+		$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create));
 		$result_task = $sth->fetch(PDO::FETCH_ASSOC);
@@ -97,13 +103,15 @@
 
 	function create_task_for_another($task, $dbh, $config, $mailer){
 		 //for another man
-		$t_fr_email=$task[0];
+		$t_email_fr=$task[0];
 		$t_name=$task[1];
-		$t_type=$task[2];
-		$t_create=$task[3];
-		$t_finish=$task[4];
+		$t_short_name=$task[2];
+		$t_type=$task[3];
+		$t_stars=$task[4];
+		$t_create=$task[5];
+		$t_finish=$task[6];
 
-		if(empty($t_fr_email)){
+		if(empty($t_email_fr)){
 			return "<div class=\"alert alert-dismissible alert-warning\">
 				<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
 				<strong>Внимание! </strong> Укажите email получателя задачи.
@@ -123,15 +131,15 @@
 		if ($count_result_today<$max_count) {
 			$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_email = :email_friend";
 			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-			$sth->execute(array(':email_friend' => $t_fr_email));
+			$sth->execute(array(':email_friend' => $t_email_fr));
 			$result_us = $sth->fetch(PDO::FETCH_ASSOC);
 
 			if ($result_us == TRUE) { //email есть
 
 				if ($result_us['u_status'] == 1) { //пользователь активирован (создание задачи и отправка сообщения о новой задачи)
-					$sql = "INSERT INTO tasks (t_name, t_date_create, t_date_finish, t_type) VALUES (:t_name, :t_date_create, :t_date_finish, :t_type)";
+					$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type)";
 					$stm = $dbh->prepare($sql);
-					$stm->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_type' => $t_type));
+					$stm->execute(array(':t_name' => $t_name, ':t_short_name' => $t_short_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_raiting' => $t_stars, ':t_type' => $t_type));
 
 					$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -146,20 +154,20 @@
 						//$message = \Swift_Message::newInstance()
 						//	->setSubject('Для Вас есть новая задача')
 						//	->setFrom(array($config['mail']['user']))
-						//	->setTo(array($t_fr_email))
+						//	->setTo(array($t_email_fr))
 						//	->setBody($app['twig']->render('parts/emails/email_new_task.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $t_name, 'name' => $_SESSION['user']['u_name'].$_SESSION['user']['u_surname'])),'text/html');
 					//	$mailer->send($message);
 					//}
 
 					return "<div class=\"alert alert-dismissible alert-success\">
 						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_fr_email."!
+						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
 						</div>";
 
 				} elseif ($result_us['u_status'] == 0) { //пользователь не активирован (создание заачи без отправки сообщения)
-					$sql = "INSERT INTO tasks (t_name, t_date_create, t_date_finish, t_type) VALUES (:t_name, :t_date_create, :t_date_finish, :t_type)";
+					$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type)";
 					$stm = $dbh->prepare($sql);
-					$stm->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_type' => $t_type));
+					$stm->execute(array(':t_name' => $t_name, ':t_short_name' => $t_short_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_raiting' => $t_stars, ':t_type' => $t_type));
 
 					$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 					$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -172,23 +180,23 @@
 
 							return "<div class=\"alert alert-dismissible alert-success\">
 								<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-								<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_fr_email."!
+								<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
 							</div>";
 
 				}
 			} else { //email в базе нет (добавление пользователя, создание задачи и отправка одного собщения сприглашением в проект)
 				$sql = "INSERT INTO users (u_email) VALUES (:u_email)";
 				$stm = $dbh->prepare($sql);
-				$stm->execute(array(':u_email' => $t_fr_email));
+				$stm->execute(array(':u_email' => $t_email_fr));
 							
 				$sql = "SELECT u_id FROM users WHERE u_email = :u_email";
 				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-				$sth->execute(array(':u_email' => $t_fr_email));
+				$sth->execute(array(':u_email' => $t_email_fr));
 				$result_use = $sth->fetch(PDO::FETCH_ASSOC);
 
-				$sql = "INSERT INTO tasks (t_name, t_date_create, t_date_finish, t_type) VALUES (:t_name, :t_date_create, :t_date_finish, :t_type)";
+				$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type)";
 				$stm = $dbh->prepare($sql);
-				$stm->execute(array(':t_name' => $t_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_type' => $t_type));
+				$stm->execute(array(':t_name' => $t_name, ':t_short_name' => $t_short_name, ':t_date_create' => $t_create, ':t_date_finish' => $t_finish, ':t_raiting' => $t_stars, ':t_type' => $t_type));
 
 				$sql = "SELECT t_id FROM tasks WHERE t_name = :t_name AND t_date_create = :t_date_create";
 				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -202,13 +210,13 @@
 				//$message = \Swift_Message::newInstance()
 				//	->setSubject('Приглашаем Вас в проект!')
 				//	->setFrom(array($config['mail']['user']))
-				//	->setTo(array($t_fr_email))
+				//	->setTo(array($t_email_fr))
 				//	->setBody($app['twig']->render('parts/emails/email_new_task_for_new_user.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $t_name, 'site' => $_SERVER['HTTP_HOST'])),'text/html');
 				//$mailer->send($message);
 
 				return "<div class=\"alert alert-dismissible alert-success\">
 						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_fr_email."!
+						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
 						</div>";	
 			}
 		} else {

@@ -37,7 +37,6 @@ function registration ($request, $app){
 
 	if (count(@$error) > 0) {
 		return $error;
-		exit();
 	}
 
 	$reg_activation=md5($reg_email.time());
@@ -51,7 +50,6 @@ function registration ($request, $app){
 		if ($result_email[0]['u_status'] == 1) {
 			$error[] = 'Такой email уже существует!';
 			return $error;
-			exit();
 		} else {
 			$sql = "UPDATE `users` SET `u_name`=:u_name,`u_surname`=:u_surname,`u_city`=:u_city,`u_phone_number`=:u_phone_number,`u_password`=:u_password,`u_activation`=:u_activation,`u_date_registration`=:u_date_registration,`u_date_active`=:u_date_active WHERE 'u_email' = :u_email";
 			$stm = $dbh->prepare($sql);
@@ -105,7 +103,6 @@ function activation ($activation) {
 
 	if (code_activation_valid($activation) !== TRUE) {
 		return code_activation_valid($activation);
-		exit();
 	} else {
 			
 		$sql = "SELECT u_status FROM users WHERE u_activation = :u_activation";
@@ -114,7 +111,6 @@ function activation ($activation) {
 		$result = $sth->fetch(PDO::FETCH_ASSOC);
 		if ($result == FALSE) {
 			return "Ошибка, неправильная ссылка активации";
-			exit();
 		} else {
 			if ($result['u_status'] == 0) {
 				$sql = "UPDATE users SET u_status = :u_status WHERE u_activation = :u_activation";
@@ -143,7 +139,6 @@ function authorization ($request){
 
 	if (count(@$error) > 0) {
 		return $error;
-		exit();
 	}
 
 	global $dbh;
@@ -155,7 +150,6 @@ function authorization ($request){
 	if ($result['u_id'] == 0){
 		$error[] = "Пользователя с таким email в системе не существует! Зарегистрируйтесь!";
 		return $error;
-		exit();
 	} else {
 		if (password_verify($in_password, $result['u_password'])) {
 			if($in_remember==TRUE) {
@@ -175,7 +169,6 @@ function authorization ($request){
 		// Invalid credentials
 			$error[] =  "Неверный пароль, повторите попытку!";
 			return $error;
-			exit();
 		}
 	}
 }
@@ -197,7 +190,6 @@ function analyzer ($u_id){
 
 	if (isset($error)) {
 		return $error;
-		exit();
 	}
 
 	$sql = "SELECT * FROM users WHERE u_id = :u_id";
@@ -209,21 +201,17 @@ function analyzer ($u_id){
 			if ($_SESSION['user']['u_id'] == $u_id) {
 				$user['template'] = "authorization";
 				return $user;
-				exit();
 			} else {
 				$user = $result;
 				$user['template'] = "guest";
 				return $user;
-				exit();
 			}				
 		} else {			
 			$user['template'] = "non_authorization";
 			return $user;		
-			exit();
 		}
 	} else {
 		return 404;
-		exit();
 	}
 }
 	
