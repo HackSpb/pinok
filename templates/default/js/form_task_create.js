@@ -130,12 +130,12 @@
 						//alert(query);
 						//return false;
 						$.ajax({
-							type: "POST",
-							url: "/task/do/create",
+							type: 'POST',
+							url: '/task/do/create',
 							data: query,
 							success: function(answer) {
 								$("#answer").html(answer);
-								download_list();
+								download_list_right();
 							}
 						});	
 						$('#create_task_form')[0].reset();
@@ -154,19 +154,20 @@
 		  				deadline_date.innerHTML = '';
 						return false;
 					}
-				}
+				};
 
 				$(document).ready(function(){
-				    download_list();
+				    download_list_right();
+				    render_list_content();
 				});
 
-				function download_list(){
-					$.getJSON("/task/select/list",
+				function download_list_right(){
+					$.getJSON('/task/list/right',
 				        function(data){
 				        console.log(data);
 				        var i; 
 				       
-				        var s = $('#temp_task').html();// берем образцовый хтмл из скрытого шаблона 
+				        var s = $('#task_list_right').html();// берем образцовый хтмл из скрытого шаблона 
 				        if (data.imp != 1) {
 							for (i=0;i<50;i++){
 								directives = {
@@ -211,5 +212,60 @@
 								$('#id_fav_'+i).render(data.fav['number_'+i], directives); 
 							}	
 						}
+						if (data.new != 1) {
+							for (i=0;i<50;i++){
+								directives = {
+									link: {
+									    href: function(params) {
+									    	return "?task_n=" + data.new['number_'+i].t_id;
+									    }
+									}
+								};
+					
+								$('#new').append("<div id='id_new_"+i+"'>"+ s + "</div>"); 
+					
+								$('#id_new_'+i).render(data.new['number_'+i], directives); 
+							}	
+						}
 				    });
-				}
+				};
+
+				function render_list_content(){
+					var y = location.search;
+					$.getJSON('/task/list/content' + y,
+						function(data){
+							console.log(data);
+							var countall = data['count_all'];
+							var lim = data['lim'];
+							var task = data['task_type'];
+							var page = countall/lim;
+							var newpage = Math.ceil(page);
+							var z;
+							if (countall>lim){
+								for (z=1; z<=newpage; z++) {
+									$('#page').append('<a onclick="sendData(\'?task='+task+'&page='+z+'\');" href="javascript://"><button>'+z+'</button></a>');  
+								}
+							}
+							var i;  
+							var s = $('#task_list_content').html();
+							for (i=0;i<=lim;i++) {
+								directives = {
+											link: {
+											    href: function(params) {
+											    	return "?task_n=" + data.content['number_'+i].t_id;
+											    }
+											}
+										};	
+								$('#content').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
+						
+								$('#id_content_list_'+i).render(data.content['number_'+i], directives); 
+							};
+						}
+					)
+				};
+
+
+			function sendData (sData) {
+				location.search = sData;
+			}; 
+	

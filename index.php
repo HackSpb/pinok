@@ -76,8 +76,12 @@ $app->match('/task/do/create', function(Request $request) use ($app) {
 	return create_task($app, $request);
 });
 
-$app->match('/task/select/list', function(Request $request) use ($app) {
-	return task_select_list($request);
+$app->match('/task/list/right', function(Request $request) use ($app) {
+	return task_list_right($request);
+});
+
+$app->match('/task/list/content', function(Request $request) use ($app) {
+	return task_list_content($request);
 });
 
 $app->match('/task/update/status', function(Request $request) use ($app) {

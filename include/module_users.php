@@ -290,10 +290,10 @@
 		}
 	}
 	
-	function task_select_list($request) {
+	function task_list_right($request) {
 		global $dbh;
 
-		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id = :u_id AND t_type != 4 ORDER BY t_raiting DESC LIMIT 5";
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id=:u_id AND t_raiting != 0 AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 ORDER BY t_raiting DESC, t_date_create DESC LIMIT 5";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
 		$important_tasks = $sth->fetchAll();
@@ -309,7 +309,7 @@
 		}
 
 
-		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=1 AND u_id = :u_id AND t_type != 4 ORDER BY t_date_create DESC LIMIT 5";
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id=:u_id AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 ORDER BY t_date_create DESC LIMIT 5";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
 		$last_tasks = $sth->fetchAll();
@@ -325,7 +325,7 @@
 		}
 
 
-		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN tasks_favourite USING (t_id) WHERE u_id = :u_id ORDER BY t_date_create DESC LIMIT 15";
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN tasks_favourite USING (t_id) WHERE u_id = :u_id AND t_type != 4 AND t_delete = 0 ORDER BY tf_date DESC LIMIT 15";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
 		$favourite_tasks = $sth->fetchAll();
@@ -340,10 +340,118 @@
 			$favourite_new_tasks = 1;
 		}
 
-		$result = array('imp' => $important_new_tasks, 'last' => $last_new_tasks, 'fav' => $favourite_new_tasks);
+
+		$sql = "SELECT t_id, t_short_name FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role = 2 AND u_id = :u_id AND t_type != 4 AND t_accept_with_task = 0 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 AND t_id IN (SELECT t_id FROM users_tasks WHERE u_id != :u_id AND ut_role = 1) ORDER BY task_date_create DESC LIMIT 5";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$new_tasks = $sth->fetchAll();
+		
+		if (count($new_tasks) > 0) {
+			$count_new_tasks = count($new_tasks);
+			
+			for ($stroka_v_massive = 0; $stroka_v_massive < $count_new_tasks; $stroka_v_massive++) {
+				$new_new_tasks['number_' . $stroka_v_massive] = $new_tasks[$stroka_v_massive];
+			}
+		} else {
+			$new_new_tasks = 1;
+		}
+
+		$result = array('imp' => $important_new_tasks, 'last' => $last_new_tasks, 'fav' => $favourite_new_tasks, 'new' => $new_new_tasks);
 		return json_encode ($result);
 	}
-	
+		
+
+	function task_list_content($request) {
+		global $config;
+		$lim = $config['settings']['count_task_on_one_page'];	//count of product on one page
+		$page = $request->get('page');
+		$task_type = $request->get('task_t');
+		if (!isset($task_type)) $task_type='imp';
+		if ($task_type == 'imp') {  //important task
+			$sql_all = "SELECT t_id FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id=:u_id AND t_raiting != 0 AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0";
+			$sql_special = "SELECT t_short_name, t_id, t_date_create, t_date_finish, t_raiting FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role = 2 AND u_id = ? AND u_id = ? AND t_raiting != 0 AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 ORDER BY t_raiting DESC, t_date_create DESC LIMIT ?,?";			
+		} elseif ($task_type == 'last') { //last task
+			$sql_all = "SELECT t_id FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=2 AND u_id=:u_id AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0";
+			$sql_special = "SELECT t_short_name, t_id, t_date_create, t_date_finish, t_raiting FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role = 2 AND u_id = ? AND u_id = ? AND t_type != 4 AND t_accept_with_task = 1 AND t_status = 1 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 ORDER BY t_date_create DESC LIMIT ?,?";	
+		} elseif ($task_type == 'fav') { //favourite task
+			$sql_all = "SELECT t_id FROM tasks LEFT JOIN tasks_favourite USING (t_id) WHERE u_id = :u_id AND t_type != 4 AND t_delete = 0";
+			$sql_special = "SELECT t_short_name, t_id, t_date_create, t_date_finish, t_raiting FROM tasks LEFT JOIN tasks_favourite USING (t_id) WHERE u_id = ? AND u_id = ? AND t_type != 4 AND t_delete = 0 ORDER BY tf_date DESC LIMIT ?,?";
+		} elseif ($task_type == 'new') { //favourite task
+			$sql_all = "SELECT t_id FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role = 2 AND u_id = :u_id AND t_type != 4 AND t_accept_with_task = 0 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 AND t_id IN (SELECT t_id FROM users_tasks WHERE u_id != :u_id AND ut_role = 1)";
+			$sql_special = "SELECT t_short_name, t_id, t_date_create, t_date_finish, t_raiting FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role = 2 AND u_id = ? AND t_type != 4 AND t_accept_with_task = 0 AND t_archive = 0 AND t_cancel = 0 AND t_delete = 0 AND t_id IN (SELECT t_id FROM users_tasks WHERE u_id != ? AND ut_role = 1) ORDER BY task_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'proj') { //projects
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=? and t_id in (select t_id from users_tasks where u_id!=? and ut_role=2) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
+		} elseif ($task_type == 'even_all') { //all events
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'even_fm') { //all events for me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'even_fmbm') { //events for me by me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'even_fmba') { //events for me by another man
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'even_fabm') { //events for another by me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'task_all') { //all tasks
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'task_fm') { //all tasks for me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'task_fmbm') { //tasks for me by me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'task_fmba') { //tasks for me by another man
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";
+		} elseif ($task_type == 'task_fabm') { //tasks for another by me
+			//$sql_all = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=:u_id and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=1)";
+			//$sql_special = "select * from tasks left join users_tasks USING (t_id) where ut_role=2 and u_id=? and t_accept_with_task=0 and t_id in (select t_id from users_tasks where u_id!=? and ut_role=1) ORDER BY t_status DESC, t_date_create DESC LIMIT ?,?";	
+		} else {
+			$result['number_0']['t_name'] = 'Ошибка!';
+			return json_encode ($result);
+		}
+
+		global $dbh;
+		$sth = $dbh->prepare($sql_all, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$result_simple = $sth->fetchAll();
+		$count_result = count($result_simple);
+			
+		if (isset($page) && $page > 0) {
+			$number_page = $page;
+		} else {
+			$number_page = 1;
+		}
+		$start = ($number_page - 1) * $lim;
+			
+		$stm = $dbh->prepare($sql_special);		
+		$stm->bindValue(1, $_SESSION['user']['u_id'], PDO::PARAM_INT);	
+		$stm->bindValue(2, $_SESSION['user']['u_id'], PDO::PARAM_INT);		
+		$stm->bindValue(3, $start, PDO::PARAM_INT);
+		$stm->bindValue(4, $lim, PDO::PARAM_INT);
+		$stm->execute();
+		$result_special = $stm->fetchAll();
+		$count_result_special = count($result_special);
+			
+		for ($stroka_v_massive = 0; $stroka_v_massive < $count_result_special; $stroka_v_massive++) {
+			$result_new['number_' . $stroka_v_massive] = $result_special[$stroka_v_massive];
+		}
+		$result['count_all'] = $count_result;
+		$result['lim'] = $lim;
+		$result['task_type'] = $task_type;
+		$result['content'] = $result_new;
+		return json_encode ($result);	
+	}
+
+	function task_settings_render(){
+		
+	}
 
 	function update_task_status($request) {
 		global $dbh;

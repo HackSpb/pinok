@@ -5,17 +5,19 @@
 			</div>
 			<div class="row main_block_special">
 					<div class="col-md-2" style="background:#A4ABB7; height:700px">
-						<a href="?task_n=imp"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные</div></a>
+						<a href="?task_t=imp"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные</div></a>
 						<div id="imp"></div>
-						<a href="?task_n=last"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Последние</div></a>
+						<a href="?task_t=last"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Последние</div></a>
 						<div id="last"></div>
-						<a href="?task_n=fav"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Избранные</div></a>
+						<a href="?task_t=fav"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Избранные</div></a>
 						<div id="favourite"></div>
+						<a href="?task_t=new"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Новые</div></a>
+						<div id="new"></div>
 						<a onclick="$('#all').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Все</div></a>
 						<div id="all" style="display: none;">
-							<a href="?task_n=proj"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
-							<a href="?task_n=even"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">События</div></a>
-							<a href="?task_n=task"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
+							<a href="?task_t=proj"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
+							<a href="?task_t=even"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">События</div></a>
+							<a href="?task_t=task"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
 						</div>
 					</div>
 					<div class="col-md-7">
@@ -96,13 +98,15 @@
 					</div>
 
 			</div>
-			<div class="temp_task" id="temp_task" style="display:none">			
+			<div id="task_list_right" style="display:none">			
 				<a class="link"><div class="t_short_name"></div></a>
 			</div>
-			<div class="col-md-4" style="display:none">
-				<div class="home-info-block" style="height:220px; margin-top: 20px;">
-					<h3>Покормить котенка</h3>
-					<p>Покорми котенка</p>
+			<div id="task_list_content" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="home-info-block" style="height:250px;">
+						<h3 class="t_short_name"></h3>
+						<p class="t_date_create"></p>
+					</div></a>
 				</div>
 			</div>
 			<div class="col-md-12" style="display:none">
