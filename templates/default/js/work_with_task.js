@@ -159,6 +159,7 @@
 				$(document).ready(function(){
 				    download_list_right();
 				    render_list_content();
+				    task_information();
 				});
 
 				function download_list_right(){
@@ -243,7 +244,8 @@
 							var z;
 							if (countall>lim){
 								for (z=1; z<=newpage; z++) {
-									$('#page').append('<a onclick="sendData(\'?task='+task+'&page='+z+'\');" href="javascript://"><button>'+z+'</button></a>');  
+
+									$('#page').append('<a onclick="sendData(\'?task_t='+task+'&page='+z+'\');" href="javascript://"><button>'+z+'</button></a>');  
 								}
 							}
 							var i;  
@@ -256,7 +258,7 @@
 											    }
 											}
 										};	
-								$('#content').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
+								$('#list').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
 						
 								$('#id_content_list_'+i).render(data.content['number_'+i], directives); 
 							};
@@ -268,4 +270,58 @@
 			function sendData (sData) {
 				location.search = sData;
 			}; 
-	
+		
+			function task_information() {
+				var y = location.search;
+					$.getJSON('/task/information/content' + y,
+						function(data){
+							console.log(data);
+							if (data.type == 4) {
+								var i;  
+								var s = $('#task_information_content').html();
+								
+								$('#project').append("<div id='id_proj_inf'>"+ s + "</div>"); 
+							
+								$('#id_proj_inf').render(data['project']);
+
+								var countall = data['count_all'];
+								var lim = data['lim'];
+								var page = countall/lim;
+								var newpage = Math.ceil(page);
+								var id = data['id'];
+								var z;
+								if (countall>lim){
+									for (z=1; z<=newpage; z++) {
+										
+										$('#page').append('<a onclick="sendData(\'?task_n='+id+'&page='+z+'\');" href="javascript://"><button>'+z+'</button></a>');  
+									}
+								}
+ 
+								var s = $('#task_list_content').html();
+								
+								for (i=0;i<=lim;i++) {
+									if ( [('number_' + i)] in data.content ) {
+										directives = {
+													link: {
+													    href: function(params) {
+													    	return "?task_n=" + data.content['number_'+i].t_id;
+													    }
+													}
+												};	
+										$('#list').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
+								
+										$('#id_content_list_'+i).render(data.content['number_'+i], directives); 
+									}
+								};
+								
+							} else {
+								var i;  
+								var s = $('#task_information_content').html();
+								
+								$('#list').append("<div id='id_content_inf'>"+ s + "</div>"); 
+							
+								$('#id_content_inf').render(data['task']); 
+							}
+						}
+					)
+			}

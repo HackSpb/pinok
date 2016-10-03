@@ -21,7 +21,7 @@
 						</div>
 					</div>
 					<div class="col-md-7">
-						<div id="content"></div>
+						<div id="content"><div id="project"></div><div id="list"></div><center><div class="col-md-12" style="padding-top:20px;"><div id="page"></div></div></center></div>
 					</div>
 					<div class="col-md-3" style="background:#A4ABB7">
 						<form id="create_task_form">
@@ -109,11 +109,17 @@
 					</div></a>
 				</div>
 			</div>
-			<div class="col-md-12" style="display:none">
-				<div class="home-info-block" style="height:220px; margin-top: 20px;">
-					<h3 class="t_name"></h3>
-					<p></p>
+			<div id="task_information_content" style="display:none">
+				<div class="col-md-12">
+					<div class="home-info-block" style="height:220px; margin-top: 20px;">
+						<h3 class="t_name"></h3>
+						<p class="t_date_create"></p>
+						<p class="t_description"></p>
+						<p class="t_date_finish"></p>
+						<p class="t_status"></p>
+						<p class="t_type"></p>
+						<p class="t_raiting"></p>
+					</div>
 				</div>
 			</div>
-			<script type="text/javascript" src="{{asset('templates/default/js/form_task_create.js')}}"></script>
-		
+			<script type="text/javascript" src="{{asset('templates/default/js/work_with_task.js')}}"></script>

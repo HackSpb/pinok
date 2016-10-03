@@ -84,12 +84,32 @@ $app->match('/task/list/content', function(Request $request) use ($app) {
 	return task_list_content($request);
 });
 
+$app->match('/task/information/content', function(Request $request) use ($app) {
+	return task_information_render($request);
+});
+
 $app->match('/task/update/status', function(Request $request) use ($app) {
 	return update_task_status($request);
 });
 
 $app->match('/task/update/accept', function(Request $request) use ($app) {
 	return update_task_accept($request);
+});
+
+$app->match('/task/update/raiting', function(Request $request) use ($app) {
+	return update_task_raiting($request);
+});
+
+$app->match('/task/update/archive', function(Request $request) use ($app) {
+	return update_task_archive($request);
+});
+
+$app->match('/task/update/cancel', function(Request $request) use ($app) {
+	return update_task_cancel($request);
+});
+
+$app->match('/task/update/delete', function(Request $request) use ($app) {
+	return update_task_delete($request);
 });
 
 $app->match('/task/statistics/select', function(Request $request) use ($app) {

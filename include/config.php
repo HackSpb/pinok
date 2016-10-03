@@ -32,7 +32,8 @@ $config['mail']['encryption'] = 'ssl';
 $config['mail']['user'] = 'bramin90@gmail.com';
 $config['mail']['password'] = 'Nashlazyb';
 
-$config['settings']['count_task_on_one_page'] = 5;
+$config['settings']['count_task_on_one_page'] = 9;
+$config['settings']['count_task_under_project'] = 3;
 $config['settings']['template'] = 'default';
 $config['settings']['count_task_for_another_people']['tarif_free'] = 5;
 $config['settings']['count_task_for_another_people']['tarif_sms'] = 20;
