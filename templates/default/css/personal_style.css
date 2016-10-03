@@ -500,3 +500,14 @@ a:hover {
 .inf_star {
   font-size: 15pt;
 }
+
+.style_fast_form {
+  margin-bottom: 10px;
+  background: #f9fde2;
+  border-radius: 4px;
+  border-color: black;
+  border: 1px;
+  padding: 0.5%;
+  -webkit-box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);
+}
