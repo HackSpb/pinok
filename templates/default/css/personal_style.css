@@ -389,4 +389,114 @@ display:none;
    content: "\2605";
    position: absolute;
    color: yellow;
-};
+}
+
+.main_tasks {
+  background: #fefcea;
+  background: linear-gradient(to top, #fefcea, #f1da36);
+  border-radius: 4px;
+  border-color: black;
+  border: 1px;
+  padding: 0.5%;
+  -webkit-box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);
+}
+
+.right_colomn {
+ background: #FDFAE2;
+  border-radius: 4px;
+  border-color: black;
+  border: 1px;
+  padding: 0.5%;
+  -webkit-box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  0px 0px 5px 0px rgba(0, 0, 0, .45);
+
+}
+
+.button_right_colomn {
+  height:20px; 
+  background:grey; 
+  color: yellow; 
+  margin-top:10px;
+  text-align: center;
+}
+
+.point_right_colomn {
+  color: black;
+}
+
+.task_sticker {
+  margin-bottom: 20px;
+  box-sizing:border-box;
+  padding:20px;
+  border-radius:5px; 
+  background:RGBA(255,255,255,1);
+  -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  0px 0px 10px 0px rgba(0, 0, 0, .45);
+  height:150px;
+  color:black;
+  text-align: center; 
+}
+
+.task_sticker:hover, .task_sticker :focus{
+  -moz-box-shadow: 0px 10px 7px rgba(0,0,0,.7);
+  -webkit-box-shadow: 10px 10px 10px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  10px 10px 10px 0px rgba(0, 0, 0, .45);
+  -webkit-transform: scale(1.15);
+  -moz-transform: scale(1.15);
+  -o-transform: scale(1.15);
+  position:relative;
+  z-index:5;
+}
+
+a:hover { 
+ text-decoration: none; /* Убираем подчеркивание */
+} 
+
+.task_information {
+   margin-bottom: 20px;
+  box-sizing:border-box;
+  padding:20px;
+  border-radius:5px; 
+  background:RGBA(255,255,255,1);
+  -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .45);        
+  box-shadow:  0px 0px 10px 0px rgba(0, 0, 0, .45);
+  height:100%;
+  color:black;
+}
+
+.project_style {
+  background: #ccf5ff;
+}
+
+.event_style {
+  background:  #ffb366;
+}
+
+.task_style {
+  background: #b3ff66;
+}
+
+.warnining_1_n {
+  background: #ffffff;
+}
+
+.warnining_2_n {
+  background: #ffcccc;
+}
+
+.warnining_3_n {
+  background: #ff9999;
+}
+
+.warnining_4_n {
+  background: #ff6666;
+}
+
+.warnining_5_n {
+  background: #ff3333;
+}
+
+.inf_star {
+  font-size: 15pt;
+}

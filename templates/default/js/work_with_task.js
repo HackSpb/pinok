@@ -249,17 +249,39 @@
 								}
 							}
 							var i;  
-							var s = $('#task_list_content').html();
+							
 							for (i=0;i<=lim;i++) {
+
 								directives = {
 											link: {
 											    href: function(params) {
 											    	return "?task_n=" + data.content['number_'+i].t_id;
 											    }
 											}
-										};	
-								$('#list').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
-						
+										};
+								if (task == 'imp') {
+									if (data.content['number_'+i]['t_raiting'] == 5) {
+										var s = $('#task_warn_5').html();
+									} else if (data.content['number_'+i]['t_raiting'] == 4) {
+										var s = $('#task_warn_4').html();
+									} else if (data.content['number_'+i]['t_raiting'] == 3) {
+										var s = $('#task_warn_3').html();
+									} else if (data.content['number_'+i]['t_raiting'] == 2) {
+										var s = $('#task_warn_2').html();
+									} else if (data.content['number_'+i]['t_raiting'] == 1) {
+										var s = $('#task_warn_1').html();
+									}
+								} else {
+									if (data.content['number_'+i]['t_type'] == 4) {
+										var s = $('#project_list_content').html();
+									} else if (data.content['number_'+i]['t_type'] == 61) {
+										var s = $('#event_list_content').html();
+									} else if (data.content['number_'+i]['t_type'] == 62) {
+										var s = $('#task_list_content').html();
+									}
+								}
+								
+								$('#list').append("<div id='id_content_list_"+i+"'>"+ s + "</div>");
 								$('#id_content_list_'+i).render(data.content['number_'+i], directives); 
 							};
 						}
@@ -277,6 +299,17 @@
 						function(data){
 							console.log(data);
 							if (data.type == 4) {
+								if (data.project.t_type == 4) {
+									data.project.t_type = 'Проект';
+								}
+								if (data.project.t_status == 1) {
+									data.project.t_status = 'Активен';
+								} else if (data.project.t_status == 0) {
+									data.project.t_status = 'Выполнен';
+								}
+								if (data.project.t_date_finish == '0000-00-00 00:00:00') {
+									data.project.t_date_finish = 'Не назначено';
+								}
 								var i;  
 								var s = $('#task_information_content').html();
 								
@@ -311,10 +344,25 @@
 										$('#list').append("<div id='id_content_list_"+i+"'>"+ s + "</div>"); 
 								
 										$('#id_content_list_'+i).render(data.content['number_'+i], directives); 
-									}
+									} 
 								};
 								
 							} else {
+								if (data.task.t_type == 62) {
+									data.task.t_type = 'Задача';
+								} else if (data.task.t_type == 61) {
+									data.task.t_type = 'Событие';
+								} else if (data.task.t_type == 4) {
+									data.task.t_type = 'Проект';
+								}
+								if (data.task.t_status == 1) {
+									data.task.t_status = 'Активна';
+								} else if (data.task.t_status == 0) {
+									data.task.t_status = 'Выполнена';
+								}
+								if (data.task.t_date_finish == '0000-00-00 00:00:00') {
+									data.task.t_date_finish = 'Не назначено';
+								}
 								var i;  
 								var s = $('#task_information_content').html();
 								
@@ -324,4 +372,76 @@
 							}
 						}
 					)
+			}
+
+			function update_status() {
+				var y = location.search;
+				$.ajax({
+					type: 'POST',
+					url: '/task/update/status'+y,
+					success: function(answer) {
+						$("#answer").html(answer);
+						this.className = 'project';
+		  				project.innerHTML = '';
+		  				this.className = 'list';
+		  				list.innerHTML = '';
+		  				this.className = 'page';
+		  				page.innerHTML = '';
+		  				task_information();
+					}
+				});	
+			}
+
+			function update_archive() {
+				var y = location.search;
+				$.ajax({
+					type: 'POST',
+					url: '/task/update/archive'+y,
+					success: function(answer) {
+						$("#answer").html(answer);
+						this.className = 'project';
+		  				project.innerHTML = '';
+		  				this.className = 'list';
+		  				list.innerHTML = '';
+		  				this.className = 'page';
+		  				page.innerHTML = '';
+		  				task_information();
+					}
+				});	
+			}
+
+			function update_cancel() {
+				var y = location.search;
+				$.ajax({
+					type: 'POST',
+					url: '/task/update/cancel'+y,
+					success: function(answer) {
+						$("#answer").html(answer);
+						this.className = 'project';
+		  				project.innerHTML = '';
+		  				this.className = 'list';
+		  				list.innerHTML = '';
+		  				this.className = 'page';
+		  				page.innerHTML = '';
+		  				task_information();
+					}
+				});	
+			}
+
+			function update_delete() {
+				var y = location.search;
+				$.ajax({
+					type: 'POST',
+					url: '/task/update/delete'+y,
+					success: function(answer) {
+						$("#answer").html(answer);
+						this.className = 'project';
+		  				project.innerHTML = '';
+		  				this.className = 'list';
+		  				list.innerHTML = '';
+		  				this.className = 'page';
+		  				page.innerHTML = '';
+		  				task_information();
+					}
+				});	
 			}

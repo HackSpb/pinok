@@ -1,24 +1,21 @@
 			<div class="row block_personal_task">
-				<div class="col-md-12" style="background:yellow;">
-					<div class="col-md-10"><h2>Поехать на Таити! "Это волшебное место!" </h2></div><div class="col-md-2"></div>
+				<div class="col-md-12 main_tasks">
+					<div class="col-md-10"><h3>Главная задача (приоритетная для Вас цель) </h3> <button class="btn btn-primary" onclick="alert('На данный момент, эта функция недоступна');">Создать</button></div><div class="col-md-2"></div>
 				</div>
 			</div>
 			<div class="row main_block_special">
-					<div class="col-md-2" style="background:#A4ABB7; height:700px">
-						<a href="?task_t=imp"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Важные</div></a>
+					<div class="col-md-2 right_colomn">
+						<a href="?task_t=imp"><div class="col-md-12 button_right_colomn">Важные</div></a>
 						<div id="imp"></div>
-						<a href="?task_t=last"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Последние</div></a>
+						<a href="?task_t=last"><div class="col-md-12 button_right_colomn">Последние</div></a>
 						<div id="last"></div>
-						<a href="?task_t=fav"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Избранные</div></a>
+						<a href="?task_t=fav"><div class="col-md-12 button_right_colomn">Избранные</div></a>
 						<div id="favourite"></div>
-						<a href="?task_t=new"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Новые</div></a>
+						<a href="?task_t=new"><div class="col-md-12 button_right_colomn">Новые</div></a>
 						<div id="new"></div>
-						<a onclick="$('#all').slideToggle('slow');" href="javascript://"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Все</div></a>
-						<div id="all" style="display: none;">
-							<a href="?task_t=proj"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Проекты</div></a>
-							<a href="?task_t=even"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">События</div></a>
-							<a href="?task_t=task"><div class="col-md-12" style="height:20px; background:grey; color: yellow; margin-top:10px;">Задачи</div></a>
-						</div>
+						<a href="?task_t=proj"><div class="col-md-12 button_right_colomn">Проекты</div></a>
+						<a href="?task_t=even"><div class="col-md-12 button_right_colomn">События</div></a>
+						<a href="?task_t=task"><div class="col-md-12 button_right_colomn">Задачи</div></a>
 					</div>
 					<div class="col-md-7">
 						<div id="content"><div id="project"></div><div id="list"></div><center><div class="col-md-12" style="padding-top:20px;"><div id="page"></div></div></center></div>
@@ -96,29 +93,75 @@
 								<div id="answer"></div>
 							</div>						
 					</div>
-
 			</div>
 			<div id="task_list_right" style="display:none">			
-				<a class="link"><div class="t_short_name"></div></a>
+				<a class="link"><div class="t_short_name point_right_colomn"></div></a>
+			</div>
+			<div id="project_list_content" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker project_style">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
+			</div>
+			<div id="event_list_content" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker event_style">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
 			</div>
 			<div id="task_list_content" style="display:none">
 				<div class="col-md-4">
-					<a class="link"><div class="home-info-block" style="height:250px;">
+					<a class="link"><div class="task_sticker task_style">
 						<h3 class="t_short_name"></h3>
-						<p class="t_date_create"></p>
+					</div></a>
+				</div>
+			</div>
+			<div id="task_warn_5" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker warnining_5_n">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
+			</div>
+			<div id="task_warn_4" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker warnining_4_n">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
+			</div>
+			<div id="task_warn_3" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker warnining_3_n">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
+			</div>
+			<div id="task_warn_2" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker warnining_2_n">
+						<h3 class="t_short_name"></h3>
+					</div></a>
+				</div>
+			</div>
+			<div id="task_warn_1" style="display:none">
+				<div class="col-md-4">
+					<a class="link"><div class="task_sticker warnining_1_n">
+						<h3 class="t_short_name"></h3>
 					</div></a>
 				</div>
 			</div>
 			<div id="task_information_content" style="display:none">
 				<div class="col-md-12">
-					<div class="home-info-block" style="height:220px; margin-top: 20px;">
-						<h3 class="t_name"></h3>
-						<p class="t_date_create"></p>
-						<p class="t_description"></p>
-						<p class="t_date_finish"></p>
+					<div class="task_information">
+						<h3>Название: <font class="t_name"></font></h3>
+						<p><font class="t_date_create"></font>  -  <font class="t_date_finish"></font></p>
 						<p class="t_status"></p>
 						<p class="t_type"></p>
-						<p class="t_raiting"></p>
+						<p><font class="inf_star"> &#9734;</font><font class="t_raiting"></font></p>
+						<center><button onclick="update_status();" class="btn btn-primary">Выполнено</button> <button onclick="update_archive();" button class="btn btn-primary">В архив</button> <button onclick="update_cancel();" button class="btn btn-primary">Отменить</button> <button onclick="update_delete();" button class="btn btn-primary">Удалить</button></center>
 					</div>
 				</div>
 			</div>
