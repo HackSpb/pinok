@@ -9,7 +9,7 @@ function registration ($request, $app){
 	$reg_phone_number = $request->get('reg_phone_number');
 	$reg_city = $request->get('reg_city');
 	$reg_true_with_regulations = $request->get('reg_true_with_regulations');
-	$u_date_registration = $u_date_active = date("Y-m-d H:i:s");
+	$u_date_registration = date("Y-m-d H:i:s");
 
 	global $dbh;
 	global $mailer;
@@ -51,18 +51,18 @@ function registration ($request, $app){
 			$error[] = 'Такой email уже существует!';
 			return $error;
 		} else {
-			$sql = "UPDATE `users` SET `u_name`=:u_name,`u_surname`=:u_surname,`u_city`=:u_city,`u_phone_number`=:u_phone_number,`u_password`=:u_password,`u_activation`=:u_activation,`u_date_registration`=:u_date_registration,`u_date_active`=:u_date_active WHERE 'u_email' = :u_email";
+			$sql = "UPDATE `users` SET `u_name`=:u_name,`u_surname`=:u_surname,`u_city`=:u_city,`u_phone_number`=:u_phone_number,`u_password`=:u_password,`u_activation`=:u_activation,`u_date_registration`=:u_date_registration WHERE 'u_email' = :u_email";
 			$stm = $dbh->prepare($sql);
-			$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));
+			$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration));
 
 			$sql = "INSERT INTO user_settings (u_id, us_turn_notification_about_new_task) VALUES (:u_id, :us_turn_notification_about_new_task)";
 			$stm = $dbh->prepare($sql);
 			$stm->execute(array(':u_id' => $result_email[0]['u_id'], ':us_turn_notification_about_new_task' => $config['user']['settings'][$config['user']['settings']['name']]['us_turn_notification_about_new_task']));
 		}
 	} else {
-		$sql = "INSERT INTO users (u_name, u_surname, u_city, u_phone_number, u_email, u_activation, u_password, u_date_registration, u_date_active) VALUES (:u_name, :u_surname, :u_city, :u_phone_number, :u_email, :u_activation, :u_password, :u_date_registration, :u_date_active)";
+		$sql = "INSERT INTO users (u_name, u_surname, u_city, u_phone_number, u_email, u_activation, u_password, u_date_registration) VALUES (:u_name, :u_surname, :u_city, :u_phone_number, :u_email, :u_activation, :u_password, :u_date_registration)";
 		$stm = $dbh->prepare($sql);
-		$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration, ':u_date_active' => $u_date_active));
+		$stm->execute(array(':u_name' => $reg_name, ':u_surname' => $reg_surname, ':u_city' => $reg_city, ':u_phone_number' => $reg_phone_number, ':u_email' => $reg_email, ':u_activation' => $reg_activation, ':u_password' => $hash, ':u_date_registration' => $u_date_registration));
 
 		$sql = "SELECT u_id FROM users WHERE u_email = :u_email AND u_date_registration = :u_date_registration";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -156,9 +156,9 @@ function authorization ($request){
 				$cookie_auth= mt_rand() . $in_password;
 				$auth_key = md5($cookie_auth);
 				setcookie("auth_key", $auth_key, time() + 60 * 60 * 24 * 7, "/", $_SERVER['HTTP_HOST'], false, true);
-				$sql = "UPDATE users SET u_auth_key = :auth_key WHERE u_id = :u_id";
+				$sql = "INSERT INTO session_authorization (u_id, sa_auth_key, sa_browser, sa_ip, sa_date_last_active) VALUES (:u_id, :sa_auth_key, :sa_browser, :sa_ip, :sa_date_last_active)";
 				$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-				$sth->execute(array(':auth_key' => $auth_key, ':u_id' => $result['u_id']));
+				$sth->execute(array(':u_id' => $result['u_id'], ':sa_auth_key' => $auth_key, ':sa_browser' => $_SERVER['HTTP_USER_AGENT'], ':sa_ip' => $_SERVER['REMOTE_ADDR'], ':sa_date_last_active' => date("Y-m-d H:i:s")));
 			}
 			// Success!
 			$_SESSION["user"] = $result;
@@ -175,12 +175,11 @@ function authorization ($request){
 
 
 function online () {	
-	$date_active = date("Y-m-d H:i:s");
 	global $dbh;
 
-	$sql = "UPDATE users SET u_date_active = :u_date_active WHERE u_id = :u_id";
+	$sql = "UPDATE session_authorization SET sa_date_last_active = :sa_date_last_active WHERE u_id = :u_id AND sa_auth_key = :sa_auth_key";
 	$stm = $dbh->prepare($sql);
-	$stm->execute(array(':u_id' => $_SESSION['user']['u_id'], ':u_date_active' => $date_active));
+	$stm->execute(array(':u_id' => $_SESSION['user']['u_id'], ':sa_date_last_active' => date("Y-m-d H:i:s"), ':sa_auth_key' => $_COOKIE['auth_key']));
 }
 	
 
@@ -217,17 +216,36 @@ function analyzer ($u_id){
 	
 
 function logout() {
+	global $dbh;
+	$sql = "UPDATE session_authorization SET sa_auth_key = '' WHERE u_id = :u_id AND sa_auth_key = :sa_auth_key";
+	$stm = $dbh->prepare($sql);
+	$stm->execute(array(':u_id' => $_SESSION['user']['u_id'], ':sa_auth_key' => $_COOKIE['auth_key']));
 	unset($_SESSION['user']);
 	setcookie ("auth_key", "", time() - 3600, "/", $_SERVER['HTTP_HOST'], false, true);
 }
 
 function turn_on_session() {
 	global $dbh;
-	$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_auth_key = :u_auth_key";
+	$sql = "SELECT * FROM session_authorization WHERE sa_auth_key = :sa_auth_key";
 	$sto = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-	$sto->execute(array(':u_auth_key' =>$_COOKIE['auth_key']));
+	$sto->execute(array(':sa_auth_key' =>$_COOKIE['auth_key']));
 	$result = $sto->fetch(PDO::FETCH_ASSOC);
-	if($result==TRUE) {
+	if (isset($result)) {
+		$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_id = :u_id";
+		$sto = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sto->execute(array(':u_id' => $result['u_id']));
+		$result = $sto->fetch(PDO::FETCH_ASSOC);
 		$_SESSION["user"] = $result;
+	}
+}
+
+function exam_user($id) {
+	global $dbh;
+	$sql = "SELECT u_id FROM users WHERE u_id= :u_id";
+	$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+	$sth->execute(array(':u_id' => $id));
+	$result = $sth->fetchAll();
+	if (count($result) == 0) {
+		return TRUE;
 	}
 }

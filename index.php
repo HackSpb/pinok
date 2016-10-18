@@ -55,10 +55,10 @@ $app->before(function ($request) use ($app) {
 $app->error(
         function (Exception $e) use ($app) {
             if ($e instanceof NotFoundHttpException) {
-                return $app['twig']->render('error.twig', array('code' => 404));
+                return $app['twig']->render('error.twig', array('code' => 404, 'session_user' =>  @$_SESSION['user']));
             }
             $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
-            return $app['twig']->render('error.twig', array('code' => $code));
+            return $app['twig']->render('error.twig', array('code' => $code, 'session_user' =>  @$_SESSION['user']));
         }
 );
 
@@ -156,12 +156,13 @@ $app->match('/admin', function() use ($app) {
 });
 
 $app->match('/id{u_id}', function(Request $request, $u_id) use ($app) {
+	if (exam_user($u_id)) return $app->abort(404, $app['twig']->render('error.twig', array('code' => 404)));
 	$role = analyzer($u_id);
 	if ($role == 404) {
 		return $app['twig']->render('error.twig', array('code' => $role));
 		exit();
 	}
 	return $app['twig']->render('user.twig', array('template' => $role['template'], 'user' => $role));
-});
+})->assert('u_id', '\d+');
 
 $app->run();
