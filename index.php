@@ -51,7 +51,7 @@ $app->before(function ($request) use ($app) {
     $app['twig']->addGlobal('session_user', @$_SESSION['user']);
 });
 
-/*
+
 $app->error(
         function (Exception $e) use ($app) {
             if ($e instanceof NotFoundHttpException) {
@@ -60,7 +60,7 @@ $app->error(
             $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
             return $app['twig']->render('error.twig', array('code' => $code, 'session_user' =>  @$_SESSION['user']));
         }
-);*/
+);
 //for app
 $app->match('/app/exam/connect/site', function(Request $request) use ($app) {
 	$response = array('status' => 'ok');
