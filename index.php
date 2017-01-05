@@ -62,8 +62,8 @@ $app->error(
         }
 );
 //for app
-$app->match('/app/exam/connect/site', function(Request $request) use ($app) {
-	$response = array('status' => 'ok');
+$app->match('/app/exam/connect', function(Request $request) use ($app) {
+	$response = array('status' => 11);
 	if(isset($_GET['callback'])) {
 		return $_GET['callback'] . '(' . json_encode($response) . ')';
 	}
@@ -71,14 +71,17 @@ $app->match('/app/exam/connect/site', function(Request $request) use ($app) {
 
 $app->match('/app/authorization/site', function(Request $request) use ($app) {
 	if(isset($_GET['user_email']) && isset($_GET['user_password'])) {
-		$response = array('status' => 'ok');
-		if(isset($_GET['callback'])) {
-			return $_GET['callback'] . '(' . json_encode($response) . ')';
-		}
+		$answ = app_authorization($request);
+		return $_GET['callback'] . '(' . json_encode($answ) . ')';
 	}
 });
 
-
+$app->match('/app/upload/task', function(Request $request) use ($app) {
+	if(isset($_GET['key_auth'])) {
+		$answ = app_upload_task($request);
+		return $_GET['callback'] . '(' . json_encode($answ) . ')';
+	}
+});
 
 //for script
 $app->match('/logout', function() use ($app) {
