@@ -83,6 +83,13 @@ $app->match('/app/upload/task', function(Request $request) use ($app) {
 	}
 });
 
+$app->match('/app/import/task', function(Request $request) use ($app) {
+	if(isset($_GET['key_auth'])) {
+		$answ = app_import_task($request);
+		return $_GET['callback'] . '(' . json_encode($answ) . ')';
+	}
+});
+
 //for script
 $app->match('/logout', function() use ($app) {
 	logout();
