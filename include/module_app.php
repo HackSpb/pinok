@@ -41,13 +41,9 @@ function app_authorization ($request){
 function app_upload_task ($request) {
 	global $dbh;
 	$key_auth = $request->get('key_auth');
-	$sql = "SELECT t_id, t_name, t_short_name, t_description, t_date_create, t_date_finish FROM tasks left join users_tasks USING (t_id) left join session_authorization USING (u_id) WHERE sa_auth_key = :key_auth AND ut_role = 2 and t_parent = 0 and t_id in (select t_id from users_tasks where sa_auth_key = :key_auth and ut_role=1)";
+	$sql = "SELECT t_id, t_name, t_short_name, t_description, t_date_create, t_date_finish FROM tasks left join users_tasks USING (t_id) left join session_authorization USING (u_id) WHERE sa_auth_key = :key_auth AND ut_role = 2 and t_parent = 0 and t_id in (select t_id from users_tasks where sa_auth_key = :key_auth and ut_role=1) ORDER BY t_date_create DESC";
 	$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 	$sth->execute(array(':key_auth' => $key_auth));
 	$result = $sth->fetchAll();
-	$count_result = count($result);
-	for ($stroka_v_massive = 0; $stroka_v_massive < $count_result; $stroka_v_massive++) {
-		$result_object['number_' . $stroka_v_massive] = $result[$stroka_v_massive];
-	}
-	return array('status' => 11, 'result' => $result_object);
+	return array('status' => 11, 'result' => $result);
 }
