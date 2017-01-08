@@ -41,7 +41,7 @@ function app_authorization ($request){
 function app_upload_task ($request) {
 	global $dbh;
 	$key_auth = $request->get('key_auth');
-	$sql = "SELECT t_id, t_name, t_short_name, t_description, t_date_create, t_date_finish FROM tasks left join users_tasks USING (t_id) left join session_authorization USING (u_id) WHERE sa_auth_key = :key_auth AND ut_role = 2 and t_parent = 0 /*and t_id in (select t_id from users_tasks where sa_auth_key = :key_auth and ut_role=1) */ORDER BY t_date_create DESC";
+	$sql = "SELECT t_id, t_name, t_short_name, t_description, t_date_create, t_date_finish, t_raiting FROM tasks left join users_tasks USING (t_id) left join session_authorization USING (u_id) WHERE sa_auth_key = :key_auth AND ut_role = 2 and t_parent = 0 /*and t_id in (select t_id from users_tasks where sa_auth_key = :key_auth and ut_role=1) */ORDER BY t_date_create DESC";
 	$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 	$sth->execute(array(':key_auth' => $key_auth));
 	$result = $sth->fetchAll();
@@ -75,7 +75,7 @@ function app_import_task($request) {
 	$task_deadline_day = ($request->get('task_deadline_day') == 'undefined') ? 0 : $request->get('task_deadline_day');
 	$task_deadline_hour = ($request->get('task_deadline_hour') == 'undefined') ? 0 : $request->get('task_deadline_hour');
 	$task[] = $task_type = ($request->get('task_type') == 'undefined') ? 0 : $request->get('task_type');
-	$task[] = $task_stars = 0;
+	$task[] = $task_stars = ($request->get('task_raiting') == 'undefined') ? 0 : $request->get('task_raiting');;
 	$task[] = $task_date_create = date("Y-m-d H:i:s");
 	$task[] = $task_date_finish = ($task_deadline_turn == 0) ? 'NULL' : $task_deadline_year.'-'.$task_deadline_month.'-'.$task_deadline_day.' '.$task_deadline_hour.':00:00';
 	$task[] = $key_auth = ($request->get('key_auth') == 'undefined') ? NULL : $request->get('key_auth');
@@ -128,7 +128,7 @@ function app_create_personal_task($task, $dbh){
 		$stm = $dbh->prepare($sql);
 		$stm->execute(array(':u_id_creat' => $result_user_author['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_user_author['u_id'], ':ut_role_exec' => 2));
 
-		return array('status' => 11);
+		return array('status' => 12);
 	}
 
 function app_create_task_for_another($task, $dbh, $config, $mailer){
@@ -146,18 +146,26 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 			return array('status' => 34);
 		}
 
-		$sql = "select * from tasks left join users_tasks USING (t_id) where ut_role=1 and u_id=:u_id and t_id in (select t_id from users_tasks where u_id!=:u_id and ut_role=2) and t_date_create > NOW() - INTERVAL 1 DAY";
+		$sql = "SELECT u_id, u_tarif FROM session_authorization LEFT JOIN users USING (u_id) WHERE sa_auth_key = :sa_auth_key";
 		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
-		$sth->execute(array(':u_id' => $_SESSION['user']['u_id']));
+		$sth->execute(array('sa_auth_key' => $t_key_auth));
+		$result_user_author = $sth->fetch(PDO::FETCH_ASSOC);
+		if($result_user_author == false) {
+			return array('status' => 33);
+		}
+
+		$sql = "SELECT * FROM tasks LEFT JOIN users_tasks USING (t_id) WHERE ut_role=1 AND u_id=:u_id AND t_id in (select t_id from users_tasks where u_id!=:u_id AND ut_role=2) AND t_date_create > NOW() - INTERVAL 1 DAY";
+		$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+		$sth->execute(array(':u_id' => $result_user_author['u_id']));
 		$result = $sth->fetchAll();
 		$count_result_today = count($result);
 
-		if ($_SESSION['user']['u_tarif'] == 1) $max_count = $config['settings']['count_task_for_another_people']['tarif_free'];
-		if ($_SESSION['user']['u_tarif'] == 2) $max_count = $config['settings']['count_task_for_another_people']['tarif_sms'];
-		if ($_SESSION['user']['u_tarif'] == 3) $max_count = $config['settings']['count_task_for_another_people']['tarif_call'];
+		if ($result_user_author['u_tarif'] == 1) $max_count = $config['settings']['count_task_for_another_people']['tarif_free'];
+		if ($result_user_author['u_tarif'] == 2) $max_count = $config['settings']['count_task_for_another_people']['tarif_sms'];
+		if ($result_user_author['u_tarif'] == 3) $max_count = $config['settings']['count_task_for_another_people']['tarif_call'];
 
 		if ($count_result_today<$max_count) {
-			$sql = "SELECT * FROM users left join user_settings USING (u_id) WHERE u_email = :email_friend";
+			$sql = "SELECT * FROM users LEFT JOIN user_settings USING (u_id) WHERE u_email = :email_friend";
 			$sth = $dbh->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 			$sth->execute(array(':email_friend' => $t_email_fr));
 			$result_us = $sth->fetch(PDO::FETCH_ASSOC);
@@ -176,7 +184,7 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 
 					$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
 					$stm = $dbh->prepare($sql);
-					$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
+					$stm->execute(array(':u_id_creat' => $result_user_author['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
 
 					//if ($result_us['us_turn_notification_about_new_task'] == 1) {
 						//$message = \Swift_Message::newInstance()
@@ -187,10 +195,9 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 					//	$mailer->send($message);
 					//}
 
-					return "<div class=\"alert alert-dismissible alert-success\">
-						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
-						</div>";
+					$name_user_out = ($result_us['u_name'] == NULL) ? $t_email_fr : $result_us['u_name'];
+					$info = array('user_name' => $name_user_out, 'task_name' => $t_name);
+					return array('status' => 13, 'result' => $info);
 
 				} elseif ($result_us['u_status'] == 0) { //пользователь не активирован (создание заачи без отправки сообщения)
 					$sql = "INSERT INTO tasks (t_name, t_short_name, t_date_create, t_date_finish, t_raiting, t_type) VALUES (:t_name, :t_short_name, :t_date_create, :t_date_finish, :t_raiting, :t_type)";
@@ -204,12 +211,11 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 
 					$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
 					$stm = $dbh->prepare($sql);
-					$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
+					$stm->execute(array(':u_id_creat' => $result_user_author['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_us['u_id'], ':ut_role_exec' => 2));
 
-							return "<div class=\"alert alert-dismissible alert-success\">
-								<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-								<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
-							</div>";
+					$name_user_out = ($result_us['u_name'] == NULL) ? $t_email_fr : $result_us['u_name'];
+					$info = array('user_name' => $name_user_out, 'task_name' => $t_name);
+					return array('status' => 13, 'result' => $info);
 
 				}
 			} else { //email в базе нет (добавление пользователя, создание задачи и отправка одного собщения сприглашением в проект)
@@ -233,7 +239,7 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 
 				$sql = "INSERT INTO users_tasks (u_id, t_id, ut_role) VALUES (:u_id_creat, :t_id, :ut_role_creat), (:u_id_exec, :t_id, :ut_role_exec)";
 				$stm = $dbh->prepare($sql);
-				$stm->execute(array(':u_id_creat' => $_SESSION['user']['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_use['u_id'], ':ut_role_exec' => 2));
+				$stm->execute(array(':u_id_creat' => $result_user_author['u_id'], ':t_id' => $result_task['t_id'], ':ut_role_creat' => 1, ':u_id_exec' => $result_use['u_id'], ':ut_role_exec' => 2));
 
 				//$message = \Swift_Message::newInstance()
 				//	->setSubject('Приглашаем Вас в проект!')
@@ -242,10 +248,8 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 				//	->setBody($app['twig']->render('parts/emails/email_new_task_for_new_user.twig', array('author_email' => $_SESSION['user']['u_email'], 'new_task' => $t_name, 'site' => $_SERVER['HTTP_HOST'])),'text/html');
 				//$mailer->send($message);
 
-				return "<div class=\"alert alert-dismissible alert-success\">
-						<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-						<strong>Поздравляем!</strong> Задача создана!<br>Название задачи: ".$t_name."<br>Для пользователя: ".$t_email_fr."!
-						</div>";	
+				$info = array('user_name' => $t_email_fr, 'task_name' => $t_name);
+				return array('status' => 13, 'result' => $info);
 			}
 		} else {
 			$p='P'.date("Y").'Y'.date("m").'M'.date("d").'DT'.date("H").'H'.date("i").'M'.date("s").'S';
@@ -254,9 +258,7 @@ function app_create_task_for_another($task, $dbh, $config, $mailer){
 			$time_waiting->modify('+1 day');
 			$time_waiting->sub(new DateInterval($p));
 
-			return "<div class=\"alert alert-dismissible alert-warning\">
-					<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>
-					<strong>Внимание! </strong> Вы уже отправили 5 задач за сегодня! Следующий раз, Вы сможите отправить задачу через ".$time_waiting->format('H:i:s')."<br>Последние задачи, которые Вы составили:<br>".$result[0]['t_name']."<br>".$result[1]['t_name']."<br>".$result[2]['t_name']."<br>".$result[3]['t_name']."<br>".$result[4]['t_name']."
-					</div>";	
+			$info = array('user_name' => $t_email_fr, 'task_name' => $t_name, 'times_waiting' => $time_waiting->format('H:i:s'), 'count_data' => $max_count, 'last_task_1' => $result[0]['t_name'], 'last_task_2' => $result[1]['t_name'], 'last_task_3' => $result[2]['t_name'], 'last_task_4' => $result[3]['t_name'], 'last_task_5' => $result[4]['t_name']);
+			return array('status' => 36, 'result' => $info);
 		}
 	}

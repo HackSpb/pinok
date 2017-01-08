@@ -35,11 +35,14 @@
 
 	  					$('#deadline_date').append('<select name="task_deadline_month" class="form-control" id="task_deadline_month"></select>');
 	  					var arr = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+	  					var n;
 						arr.forEach(function(item, i, arr) {
 						 	if (i == month) {
-	  							$('#task_deadline_month').append('<option selected value="'+i+'">'+item+'</option>');
+						 		n=i+1;
+	  							$('#task_deadline_month').append('<option selected value="'+n+'">'+item+'</option>');
 	  						} else {
-	  							$('#task_deadline_month').append('<option value="'+i+'">'+item+'</option>');
+	  							n=i+1;
+	  							$('#task_deadline_month').append('<option value="'+n+'">'+item+'</option>');
 	  						}
 						});
 
